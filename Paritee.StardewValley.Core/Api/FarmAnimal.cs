@@ -246,80 +246,41 @@ namespace Paritee.StardewValley.Core.Api
         public static bool ProducesAtLeastOne(int defaultProduceId, int deluxeProduceId, int[] targets)
         {
             // Must actualy be a product
-            return targets.Where(o => !o.Equals(Constants.FarmAnimal.NoProduce))
+            return targets.Where(o => !Api.FarmAnimal.ProducesNothing(o))
                 .Intersect(new int[] { defaultProduceId, deluxeProduceId })
                 .Any();
         }
 
         public static bool ProducesNothing(global::StardewValley.FarmAnimal animal)
         {
-            // This is to support "male" animals being hatched/born from their 
-            // "produce". Since they have a harvest type that requires a tool, 
-            // but none specified, they cannot produce those items.
-            return Api.FarmAnimal.RequiresToolForHarvest(animal) 
-                && Api.FarmAnimal.GetToolUsedForHarvest(animal).Equals(default(string));
+            return Api.FarmAnimal.ProducesNothing(animal.defaultProduceIndex.Value, animal.deluxeProduceIndex.Value);
         }
 
-        public static bool ProducesNothing(int harvestType, string harvestTool)
+        public static bool ProducesNothing(int defaultProduceIndex, int deluxeProduceIndex)
         {
-            // This is to support "male" animals being hatched/born from their 
-            // "produce". Since they have a harvest type that requires a tool, 
-            // but none specified, they cannot produce those items.
+            return Api.FarmAnimal.ProducesNothing(defaultProduceIndex) && Api.FarmAnimal.ProducesNothing(deluxeProduceIndex);
+        }
+
+        public static bool ProducesNothing(int produceIndex)
+        {
+            return produceIndex.Equals(Constants.FarmAnimal.NoProduce);
+        }
+
+        public static bool SearchesForProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.SearchesForProduce(animal.harvestType.Value, animal.toolUsedForHarvest.Value);
+        }
+
+        public static bool SearchesForProduce(int harvestType, string harvestTool)
+        {
             return Api.FarmAnimal.RequiresToolForHarvest(harvestType)
                 && (Api.FarmAnimal.IsDataValueNull(harvestTool));
         }
 
-        // TODO:
-        // - This is not used or tested
-        // - Potentially add sex consideration in a future update
-        // - Should be moved to a FarmAnimal.isMale() patch
-        // - Check if partial produce matches make sense; no current use cases
         public static bool IsMale(global::StardewValley.FarmAnimal animal)
         {
-            // Any animal that follows the produces nothing BFAV rules should be 
-            // assumed as male since this pattern is not commonly used
-            if (Api.FarmAnimal.ProducesNothing(animal))
-            {
-                return true;
-            }
-
-            // Produce of the animal we're going to match against
-            int[] targetProduce = new int[] {
-                animal.defaultProduceIndex.Value,
-                animal.deluxeProduceIndex.Value
-            };
-
-            // Check if any other animals exist that do produce nothing, but have the same produce indexes
-            Dictionary<string, string> data = Api.Content.LoadData<string, string>(Constants.Content.DataFarmAnimalsContentPath);
-
-            foreach (KeyValuePair<string, string> entry in data)
-            {
-                string[] values = Api.Content.ParseDataValue(entry.Value);
-
-                int defaultProduce = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.DefaultProduce]);
-                int deluxeProduce = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.DeluxeProduce]);
-
-                // Only check against animals that completely match the produce
-                if (!Api.FarmAnimal.ProducesAll(defaultProduce, deluxeProduce, targetProduce))
-                {
-                    continue;
-                }
-
-                int harvestType = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.HarvestType]);
-                string harvestTool = values[(int)Constants.FarmAnimal.DataValueIndex.ToolUsedForHarvest];
-
-                // Assume that since the source animal produces something and there's 
-                // another animal that does not produce anything, it's a female
-                if (Api.FarmAnimal.ProducesNothing(harvestType, harvestTool))
-                {
-                    return false;
-                }
-            }
-
-            // If no other animal exists that produces nothing, then use their 
-            // ID to assign them a sex. This is the same rule used for rabbits 
-            // and pigs.
-            return animal.myID.Value % 2L == 0L;
+            // TODO: expand on this
+            return animal.isMale();
         }
 
         public static string GetRandomTypeFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)

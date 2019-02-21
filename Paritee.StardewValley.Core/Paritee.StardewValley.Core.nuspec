@@ -10,7 +10,6 @@
     <projectUrl>https://github.com/paritee/Paritee.StardewValley.Core</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Hello world.</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>Stardew Valley SMAPI Mod Paritee Farm Animal</tags>
   </metadata>
