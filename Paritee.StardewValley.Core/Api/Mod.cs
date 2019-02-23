@@ -24,7 +24,7 @@ namespace Paritee.StardewValley.Core.Api
 
             return JsonConvert.DeserializeObject<T>(json);
         }
-
+        
         public static Texture2D LoadTexture(string filePath)
         {
             Texture2D texture;
