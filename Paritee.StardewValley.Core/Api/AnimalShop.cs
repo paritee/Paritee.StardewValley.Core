@@ -47,46 +47,6 @@ namespace Paritee.StardewValley.Core.Api
             return false;
         }
 
-        public static List<ClickableTextureComponent> GetAnimalsToPurchaseComponents(PurchaseAnimalsMenu menu, List<Object> stock, Dictionary<string, Texture2D> icons, out int iconHeight)
-        {
-            iconHeight = 0;
-
-            List<ClickableTextureComponent> animalsToPurchase = new List<ClickableTextureComponent>();
-
-            for (int index = 0; index < stock.Count; ++index)
-            {
-                Object obj = stock[index];
-
-                string name = obj.salePrice().ToString();
-                string label = (string)null;
-                string hoverText = obj.Name;
-
-                Rectangle bounds = new Rectangle(menu.xPositionOnScreen + IClickableMenu.borderWidth + index % 3 * 64 * 2, menu.yPositionOnScreen + IClickableMenu.spaceToClearTopBorder + IClickableMenu.borderWidth / 2 + index / 3 * 85, 128, 64);
-                Texture2D texture = icons[obj.Name];
-                Rectangle sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
-
-                float scale = 4f;
-                bool drawShadow = obj.Type == null;
-
-                ClickableTextureComponent textureComponent = new ClickableTextureComponent(name, bounds, label, hoverText, texture, sourceRect, scale, drawShadow)
-                {
-                    item = obj,
-                    myID = index,
-                    rightNeighborID = index % 3 == 2 ? -1 : index + 1,
-                    leftNeighborID = index % 3 == 0 ? -1 : index - 1,
-                    downNeighborID = index + 3,
-                    upNeighborID = index - 3
-                };
-
-                animalsToPurchase.Add(textureComponent);
-
-                // We need the icon height for the menu resize
-                iconHeight = texture.Height > iconHeight ? texture.Height : iconHeight;
-            }
-
-            return animalsToPurchase;
-        }
-
         public static bool IsBlueChickenAvailableForPurchase(global::StardewValley.Farmer farmer)
         {
             return Api.FarmAnimal.RollBlueChickenChance(farmer);
