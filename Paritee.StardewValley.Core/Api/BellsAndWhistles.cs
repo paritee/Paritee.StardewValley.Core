@@ -7,9 +7,16 @@ namespace Paritee.StardewValley.Core.Api
 {
     public class BellsAndWhistles
     {
-        public static void PlaySound(string cueName)
+        public static void PlaySound(string soundName, int timer = default(int), GameLocation location = null)
         {
-            Game1.playSound(cueName);
+            if (timer == default(int))
+            {
+                Game1.playSound(soundName);
+            }
+            else
+            {
+                DelayedAction.playSoundAfterDelay(soundName, timer, location);
+            }
         }
 
         public static bool HasSoundBank()
