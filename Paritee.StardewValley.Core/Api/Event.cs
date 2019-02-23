@@ -5,21 +5,21 @@ namespace Paritee.StardewValley.Core.Api
 {
     public class Event
     {
-        public static global::StardewValley.Event GetEventInLocation(ref GameLocation location)
+        public static global::StardewValley.Event GetEventInLocation(GameLocation location)
         {
             return location.currentEvent;
         }
 
         public static bool IsEventOccurringInLocation(GameLocation location)
         {
-            return Api.Event.GetEventInLocation(ref location) != null;
+            return Api.Event.GetEventInLocation(location) != null;
         }
 
-        public static void GoToNextEventCommandInLocation(ref GameLocation location)
+        public static void GoToNextEventCommandInLocation(GameLocation location)
         {
             if (Api.Event.IsEventOccurringInLocation(location))
             {
-                ++Api.Event.GetEventInLocation(ref location).CurrentCommand;
+                ++Api.Event.GetEventInLocation(location).CurrentCommand;
             }
         }
 
@@ -47,7 +47,7 @@ namespace Paritee.StardewValley.Core.Api
             return Api.Event.TryGetFarmEvent<T>(out farmEvent);
         }
 
-        public static void ForceQuestionEventToProceed(ref QuestionEvent questionEvent)
+        public static void ForceQuestionEventToProceed(QuestionEvent questionEvent)
         {
             questionEvent.forceProceed = true;
         }

@@ -73,18 +73,26 @@ namespace Paritee.StardewValley.Core.Api
             return animalHouse.incubatingEgg.Y > 0 || (animalHouse.incubatingEgg.X - 1) <= 0;
         }
 
-        public static void AddAnimal(ref Building building, global::StardewValley.FarmAnimal animal)
+        public static void AddAnimal(Building building, global::StardewValley.FarmAnimal animal)
         {
             global::StardewValley.AnimalHouse animalHouse = Api.AnimalHouse.GetIndoors(building);
 
-            Api.AnimalHouse.AddAnimal(ref animalHouse, animal);
-
+            Api.AnimalHouse.AddAnimal(animalHouse, animal);
         }
 
-        public static void AddAnimal(ref global::StardewValley.AnimalHouse animalHouse, global::StardewValley.FarmAnimal animal)
+        public static void AddAnimal(global::StardewValley.AnimalHouse animalHouse, global::StardewValley.FarmAnimal animal)
         {
             animalHouse.animals.Add(animal.myID.Value, animal);
-            animalHouse.animalsThatLiveHere.Add(animal.myID.Value);
+
+            if (!animalHouse.animalsThatLiveHere.Contains(animal.myID.Value))
+            {
+                animalHouse.animalsThatLiveHere.Add(animal.myID.Value);
+            }
+        }
+
+        public static global::StardewValley.Buildings.Building GetBuilding(global::StardewValley.AnimalHouse animalHouse)
+        {
+            return animalHouse.getBuilding();
         }
     }
 }

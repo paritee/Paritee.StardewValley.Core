@@ -9,7 +9,12 @@ namespace Paritee.StardewValley.Core.Helpers
             return Game1.random;
         }
 
-        public static double NextDouble()
+        public static System.Random Seed(int seed)
+        {
+            return new System.Random(seed);
+        }
+
+        public static double NextDouble(int seed = default(int))
         {
             return Helpers.Random.GetNumberGenerator().NextDouble();
         }

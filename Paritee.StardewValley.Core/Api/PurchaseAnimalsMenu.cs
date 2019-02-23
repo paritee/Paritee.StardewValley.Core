@@ -18,7 +18,7 @@ namespace Paritee.StardewValley.Core.Api
             return Helpers.Reflection.GetFieldValue<bool>(menu, "namingAnimal");
         }
 
-        public static void SetNamingAnimal(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, bool namingAnimal)
+        public static void SetNamingAnimal(global::StardewValley.Menus.PurchaseAnimalsMenu menu, bool namingAnimal)
         {
             Helpers.Reflection.GetField(menu, "namingAnimal").SetValue(menu, namingAnimal);
         }
@@ -28,7 +28,7 @@ namespace Paritee.StardewValley.Core.Api
             return Helpers.Reflection.GetFieldValue<bool>(menu, "onFarm");
         }
 
-        public static void SetOnFarm(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, bool onFarm)
+        public static void SetOnFarm(global::StardewValley.Menus.PurchaseAnimalsMenu menu, bool onFarm)
         {
             Helpers.Reflection.GetField(menu, "onFarm").SetValue(menu, onFarm);
         }
@@ -38,16 +38,16 @@ namespace Paritee.StardewValley.Core.Api
             return Helpers.Reflection.GetFieldValue<global::StardewValley.FarmAnimal>(menu, "animalBeingPurchased");
         }
 
-        public static void SetAnimalBeingPurchased(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, global::StardewValley.FarmAnimal animal)
+        public static void SetAnimalBeingPurchased(global::StardewValley.Menus.PurchaseAnimalsMenu menu, global::StardewValley.FarmAnimal animal)
         {
             Helpers.Reflection.GetField(menu, "animalBeingPurchased").SetValue(menu, animal);
         }
 
-        public static void SetUpAnimalsToPurchase(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, List<global::StardewValley.Object> stock, Dictionary<string, Texture2D> icons, out int iconHeight)
+        public static void SetUpAnimalsToPurchase(global::StardewValley.Menus.PurchaseAnimalsMenu menu, List<global::StardewValley.Object> stock, Dictionary<string, Texture2D> icons, out int iconHeight)
         {
             List<ClickableTextureComponent> components = Api.PurchaseAnimalsMenu.GetAnimalsToPurchaseComponents(menu, stock, icons, out iconHeight);
 
-            Api.PurchaseAnimalsMenu.SetAnimalsToPurchase(ref menu, components);
+            Api.PurchaseAnimalsMenu.SetAnimalsToPurchase(menu, components);
         }
 
         public static int GetPriceOfAnimal(global::StardewValley.Menus.PurchaseAnimalsMenu menu)
@@ -55,7 +55,7 @@ namespace Paritee.StardewValley.Core.Api
             return Helpers.Reflection.GetFieldValue<int>(menu, "priceOfAnimal");
         }
 
-        public static void SetPriceOfAnimal(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, int price)
+        public static void SetPriceOfAnimal(global::StardewValley.Menus.PurchaseAnimalsMenu menu, int price)
         {
             Helpers.Reflection.GetField(menu, "priceOfAnimal").SetValue(menu, price);
         }
@@ -65,7 +65,7 @@ namespace Paritee.StardewValley.Core.Api
             return Helpers.Reflection.GetFieldValue<global::StardewValley.Buildings.Building>(menu, "newAnimalHome");
         }
 
-        public static void SetNewAnimalHome(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, global::StardewValley.Buildings.Building home)
+        public static void SetNewAnimalHome(global::StardewValley.Menus.PurchaseAnimalsMenu menu, global::StardewValley.Buildings.Building home)
         {
             Helpers.Reflection.GetField(menu, "newAnimalHome").SetValue(menu, home);
         }
@@ -95,12 +95,12 @@ namespace Paritee.StardewValley.Core.Api
             return menu.animalsToPurchase;
         }
 
-        public static void SetAnimalsToPurchase(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, List<ClickableTextureComponent> animalsToPurchase)
+        public static void SetAnimalsToPurchase(global::StardewValley.Menus.PurchaseAnimalsMenu menu, List<ClickableTextureComponent> animalsToPurchase)
         {
             menu.animalsToPurchase = animalsToPurchase;
         }
 
-        public static void SetHeight(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, int height)
+        public static void SetHeight(global::StardewValley.Menus.PurchaseAnimalsMenu menu, int height)
         {
             menu.height = height;
         }
@@ -150,9 +150,9 @@ namespace Paritee.StardewValley.Core.Api
             return (int)Math.Ceiling((float)Api.PurchaseAnimalsMenu.GetAnimalsToPurchase(menu).Count / 3); // Always at least one row
         }
 
-        public static void AdjustHeightBasedOnIcons(ref global::StardewValley.Menus.PurchaseAnimalsMenu menu, int iconHeight)
+        public static void AdjustHeightBasedOnIcons(global::StardewValley.Menus.PurchaseAnimalsMenu menu, int iconHeight)
         {
-            Api.PurchaseAnimalsMenu.SetHeight(ref menu, (int)(iconHeight * 2f) + IClickableMenu.spaceToClearTopBorder + IClickableMenu.borderWidth / 2 + Api.PurchaseAnimalsMenu.GetRows(menu) * 85);
+            Api.PurchaseAnimalsMenu.SetHeight(menu, (int)(iconHeight * 2f) + IClickableMenu.spaceToClearTopBorder + IClickableMenu.borderWidth / 2 + Api.PurchaseAnimalsMenu.GetRows(menu) * 85);
         }
     }
 }

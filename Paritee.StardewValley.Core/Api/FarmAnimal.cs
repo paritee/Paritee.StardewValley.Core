@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using StardewValley;
 using StardewValley.Buildings;
 using System;
@@ -10,136 +11,41 @@ namespace Paritee.StardewValley.Core.Api
 {
     public class FarmAnimal
     {
-        public static void Reload(ref global::StardewValley.FarmAnimal animal, Building home)
-        {
-            animal.reload(home);
-        }
-
-        public static void ReloadAll()
-        {
-            for (int index = 0; index < Game1.locations.Count; ++index)
-            {
-                if (!(Game1.locations[index] is Farm farm))
-                {
-                    continue;
-                }
-
-                for (int j = 0; j < farm.buildings.Count; ++j)
-                {
-                    if (!(farm.buildings[j].indoors.Value is global::StardewValley.AnimalHouse animalHouse))
-                    {
-                        continue;
-                    }
-
-                    for (int k = 0; k < animalHouse.animalsThatLiveHere.Count(); ++k)
-                    {
-                        long id = animalHouse.animalsThatLiveHere.ElementAt(k);
-                        global::StardewValley.FarmAnimal animal = animalHouse.animals[id];
-
-                        Api.FarmAnimal.Reload(ref animal, animal.home);
-                    }
-                }
-
-                break;
-            }
-        }
+        /***
+         * Age
+         ***/
 
         public static bool IsBaby(global::StardewValley.FarmAnimal animal)
         {
             return animal.isBaby();
         }
 
-        public static bool IsSheared(global::StardewValley.FarmAnimal animal)
+
+        /***
+         * Breeding
+         ***/
+
+        public static bool IsMale(global::StardewValley.FarmAnimal animal)
         {
-            return animal.showDifferentTextureWhenReadyForHarvest.Value && animal.currentProduce.Value <= 0;
+            return animal.isMale();
         }
 
-        public static string BuildSpriteAssetName(global::StardewValley.FarmAnimal animal)
+        public static void AssociateParent(global::StardewValley.FarmAnimal animal, global::StardewValley.FarmAnimal parent)
         {
-            string prefix = "";
-
-            if (Api.FarmAnimal.IsBaby(animal))
-            {
-                prefix = Constants.FarmAnimal.BabyPrefix;
-            }
-            else if (Api.FarmAnimal.IsSheared(animal))
-            {
-                prefix = Constants.FarmAnimal.ShearedPrefix;
-            }
-
-            string assetName = prefix + animal.type.Value;
-
-            // Check if the asset exists (ex. vanilla fails on BabyDuck)
-            if (!Api.Content.Exists<Texture2D>(Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName })))
-            {
-                // Covers the BabyDuck scenario by using BabyWhite Chicken
-                assetName = Api.FarmAnimal.GetDefaultType(animal);
-            }
-
-            return Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName });
+            Api.FarmAnimal.AssociateParent(animal, Api.FarmAnimal.GetId(parent));
         }
 
-        public static AnimatedSprite CreateSprite(global::StardewValley.FarmAnimal animal)
+        public static void AssociateParent(global::StardewValley.FarmAnimal animal, long parentId)
         {
-            return new AnimatedSprite(Api.FarmAnimal.BuildSpriteAssetName(animal), Constants.Content.StartingFrame, animal.frontBackSourceRect.Width, animal.frontBackSourceRect.Height);
+            animal.parentId.Value = parentId;
         }
 
-        public static global::StardewValley.FarmAnimal CreateFarmAnimal(string type, long ownerId, string name = null, Building home = null, long myId = default(long))
-        {
-            myId = myId.Equals(default(long)) ? Api.Game.GetNewId() : myId;
 
-            global::StardewValley.FarmAnimal animal = new global::StardewValley.FarmAnimal(type, myId, ownerId)
-            {
-                Name = name,
-                displayName = name,
-                home = home
-            };
+        /***
+         * Data
+         ***/
 
-            return animal;
-        }
-
-        public static bool IsVanilla(string type)
-        {
-            return Constants.VanillaFarmAnimalType.Exists(type);
-        }
-
-        public static bool IsCoopDweller(global::StardewValley.FarmAnimal animal)
-        {
-            string buildingType = animal.home != null
-                ? animal.home.buildingType.Value
-                : animal.buildingTypeILiveIn.Value;
-
-            return buildingType.Contains(Constants.AnimalHouse.Coop);
-        }
-
-        public static string GetDefaultType(string buildingType)
-        {
-            return Api.FarmAnimal.GetDefaultType(buildingType.Equals(Constants.AnimalHouse.Coop));
-        }
-
-        public static string GetDefaultType(global::StardewValley.FarmAnimal animal)
-        {
-            return Api.FarmAnimal.GetDefaultType(Api.FarmAnimal.IsCoopDweller(animal));
-        }
-
-        public static string GetDefaultType(bool isCoop)
-        {
-            return isCoop
-                ? Api.FarmAnimal.GetDefaultCoopDwellerType()
-                : Api.FarmAnimal.GetDefaultBarnDwellerType();
-        }
-
-        public static string GetDefaultCoopDwellerType()
-        {
-            return Constants.VanillaFarmAnimalType.WhiteChicken.ToString();
-        }
-
-        public static string GetDefaultBarnDwellerType()
-        {
-            return Constants.VanillaFarmAnimalType.WhiteCow.ToString();
-        }
-
-        public static void UpdateFromData(ref global::StardewValley.FarmAnimal animal, KeyValuePair<string, string> contentDataEntry)
+        public static void UpdateFromData(global::StardewValley.FarmAnimal animal, KeyValuePair<string, string> contentDataEntry)
         {
             string[] values = Api.Content.ParseDataValue(contentDataEntry.Value);
 
@@ -194,6 +100,618 @@ namespace Paritee.StardewValley.Core.Api
             return value.Equals(null) || value.Equals("null") || value.Equals(default(string)) || value.Equals("") || value.Equals(Constants.Content.None);
         }
 
+
+        /***
+         * Friendship
+         ***/
+
+        public static void DecreaseFriendship(global::StardewValley.FarmAnimal animal, int decrease)
+        {
+            Api.FarmAnimal.IncreaseFriendship(animal, decrease * -1);
+        }
+
+        public static void IncreaseFriendship(global::StardewValley.FarmAnimal animal, int increase)
+        {
+            Api.FarmAnimal.SetFriendship(animal, Api.FarmAnimal.GetFriendship(animal) + increase);
+        }
+
+        public static void SetFriendship(global::StardewValley.FarmAnimal animal, int newAmount)
+        {
+            animal.friendshipTowardFarmer.Value = newAmount;
+        }
+
+        public static int GetFriendship(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.friendshipTowardFarmer.Value;
+        }
+
+
+        /***
+         * Fullness
+         ***/
+
+        public static byte GetFullness(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.fullness.Value;
+        }
+
+        public static void SetFindGrassPathController(global::StardewValley.FarmAnimal animal, GameLocation location)
+        {
+            animal.controller = new PathFindController(animal, location, new PathFindController.isAtEnd(global::StardewValley.FarmAnimal.grassEndPointFunction), -1, false, new PathFindController.endBehavior(global::StardewValley.FarmAnimal.behaviorAfterFindingGrassPatch), 200, Point.Zero);
+        }
+
+        public static bool IsEating(global::StardewValley.FarmAnimal animal)
+        {
+            return Helpers.Reflection.GetFieldValue<NetBool>(animal, "isEating").Value;
+        }
+
+        public static void StopEating(global::StardewValley.FarmAnimal animal)
+        {
+            Helpers.Reflection.GetField(animal, "isEating").SetValue(animal, new NetBool(false));
+        }
+
+
+        /***
+         * Happiness
+         ***/
+
+        public static byte GetHappiness(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.happiness.Value;
+        }
+
+
+        /***
+         * Harvest
+         ***/
+
+        public static bool IsSheared(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.showDifferentTextureWhenReadyForHarvest.Value && animal.currentProduce.Value <= 0;
+        }
+
+        public static bool HasHarvestType(global::StardewValley.FarmAnimal animal, int harvestType)
+        {
+            return animal.harvestType.Value.Equals(harvestType);
+        }
+
+        public static bool HasHarvestType(int harvestType, int target)
+        {
+            return harvestType.Equals(target);
+        }
+
+        public static void FindProduce(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer)
+        {
+            Helpers.Reflection.GetMethod(animal, "findTruffle").Invoke(animal, new object[] { farmer });
+        }
+
+        public static bool CanFindProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.CanFindProduce(animal.harvestType.Value, animal.toolUsedForHarvest.Value);
+        }
+
+        public static bool CanFindProduce(int harvestType, string harvestTool)
+        {
+            // NOTE: This will NOT catch when tool is -1 which allows for animals 
+            // that do not produce anything ever
+            return Api.FarmAnimal.RequiresToolForHarvest(harvestType)
+                && (Api.FarmAnimal.IsDataValueNull(harvestTool));
+        }
+
+        public static bool CanBeNamed(global::StardewValley.FarmAnimal animal)
+        {
+            // "It" harvest type doesn't allow you to name the animal. This is 
+            // mostly unused and is only seen on the Hog
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.ItHarvestType);
+        }
+
+        public static bool RequiresToolForHarvest(global::StardewValley.FarmAnimal animal)
+        {
+            // "It" harvest type doesn't allow you to name the animal. This is 
+            // mostly unused and is only seen on the Hog
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.RequiresToolHarvestType);
+        }
+
+        public static bool RequiresToolForHarvest(int harvestType)
+        {
+            // "It" harvest type doesn't allow you to name the animal. This is 
+            // mostly unused and is only seen on the Hog
+            return Api.FarmAnimal.HasHarvestType(harvestType, Constants.FarmAnimal.RequiresToolHarvestType);
+        }
+
+        public static string GetToolUsedForHarvest(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.toolUsedForHarvest.Value.Length > 0 ? animal.toolUsedForHarvest.Value : default(string);
+        }
+
+        public static bool IsToolUsedForHarvest(global::StardewValley.FarmAnimal animal, string tool)
+        {
+            return Api.FarmAnimal.IsToolUsedForHarvest(Api.FarmAnimal.GetToolUsedForHarvest(animal), tool);
+        }
+
+        public static bool IsToolUsedForHarvest(string tool, string target)
+        {
+            return tool.Equals(target);
+        }
+
+
+        /***
+         * Home
+         ***/
+
+        public static bool HasHome(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.home != null;
+        }
+
+        public static void SetFindHomeDoorPathController(global::StardewValley.FarmAnimal animal, GameLocation location)
+        {
+            if (Api.FarmAnimal.HasHome(animal))
+            {
+                return;
+            }
+
+            animal.controller = new PathFindController(animal, location, new PathFindController.isAtEnd(PathFindController.isAtEndPoint), 0, false, null, 200, new Point(animal.home.tileX.Value + animal.home.animalDoor.X, animal.home.tileY.Value + animal.home.animalDoor.Y));
+        }
+
+        public static bool IsCoopDweller(global::StardewValley.FarmAnimal animal)
+        {
+            string buildingType = Api.FarmAnimal.HasHome(animal)
+                ? animal.home.buildingType.Value
+                : animal.buildingTypeILiveIn.Value;
+
+            return buildingType.Contains(Constants.AnimalHouse.Coop);
+        }
+
+        public static bool CanLiveIn(global::StardewValley.FarmAnimal animal, Building building)
+        {
+            return building.buildingType.Value.Contains(animal.buildingTypeILiveIn.Value);
+        }
+
+        public static void SetHome(global::StardewValley.FarmAnimal animal, Building home)
+        {
+            animal.home = home;
+            animal.homeLocation.Value = home == null ? default(Vector2) : new Vector2(home.tileX.Value, home.tileY.Value);
+        }
+
+        public static bool ReturnHome(global::StardewValley.FarmAnimal animal)
+        {
+            if (!Api.FarmAnimal.HasHome(animal))
+            {
+                return false;
+            }
+
+            Building home = animal.home;
+
+            Api.AnimalHouse.AddAnimal(home, animal);
+            Api.FarmAnimal.SetRandomPositionInHome(animal);
+            Api.FarmAnimal.SetRandomFacingDirection(animal);
+
+            animal.controller = null;
+
+            return true;
+        }
+
+        public static bool SetRandomPositionInHome(global::StardewValley.FarmAnimal animal)
+        {
+            if (!Api.FarmAnimal.HasHome(animal))
+            {
+                return false;
+            }
+
+            animal.setRandomPosition(animal.home.indoors.Value);
+
+            return true;
+        }
+
+        public static void AddToBuilding(global::StardewValley.FarmAnimal animal, Building building)
+        {
+            Api.FarmAnimal.SetHome(animal, building);
+            Api.FarmAnimal.SetRandomPositionInHome(animal);
+            Api.AnimalHouse.AddAnimal(building, animal);
+        }
+
+
+        /***
+         * IDs
+         ***/
+
+        public static long GetId(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.myID.Value;
+        }
+
+        public static long GetOwnerId(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.ownerID.Value;
+        }
+
+        public static string GetName(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.Name;
+        }
+
+        public static bool HasName(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.GetName(animal) != null;
+        }
+
+
+        /***
+         * Produce
+         ***/
+
+        public static int GetCurrentProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.currentProduce.Value;
+        }
+
+        public static int GetDefaultProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.defaultProduceIndex.Value;
+        }
+
+        public static int GetDeluxeProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.deluxeProduceIndex.Value;
+        }
+
+        public static bool HasProduceThatMatchesAll(global::StardewValley.FarmAnimal animal, int[] targets)
+        {
+            // Intersection length should match target length
+            return Api.FarmAnimal.HasProduceThatMatchesAll(Api.FarmAnimal.GetDefaultProduce(animal), Api.FarmAnimal.GetDeluxeProduce(animal), targets);
+        }
+
+        public static bool HasProduceThatMatchesAll(int defaultProduceId, int deluxeProduceId, int[] targets)
+        {
+            int[] produceIndexes = new int[] { defaultProduceId, deluxeProduceId };
+
+            // Intersection length should not change
+            return produceIndexes.Intersect(targets)
+                .Count().Equals(produceIndexes.Length);
+        }
+
+        public static bool HasProduceThatMatchesAtLeastOne(global::StardewValley.FarmAnimal animal, int[] targets)
+        {
+            return Api.FarmAnimal.HasProduceThatMatchesAtLeastOne(Api.FarmAnimal.GetDefaultProduce(animal), Api.FarmAnimal.GetDeluxeProduce(animal), targets);
+        }
+
+        public static bool HasProduceThatMatchesAtLeastOne(int defaultProduceId, int deluxeProduceId, int[] targets)
+        {
+            // Must actualy be a product
+            return targets.Where(o => Api.FarmAnimal.IsProduceAnItem(o))
+                .Intersect(new int[] { defaultProduceId, deluxeProduceId })
+                .Any();
+        }
+
+        public static bool AreProduceItems(global::StardewValley.FarmAnimal animal)
+        {
+            return IsDefaultProduceAnItem(animal)
+                && IsDeluxeProduceAnItem(animal);
+        }
+
+        public static bool AreProduceItems(int defaultProduceIndex, int deluxeProduceIndex)
+        {
+            return IsProduceAnItem(defaultProduceIndex)
+                && IsProduceAnItem(deluxeProduceIndex);
+        }
+
+        public static bool IsAtLeastOneProduceAnItem(global::StardewValley.FarmAnimal animal)
+        {
+            return IsDefaultProduceAnItem(animal)
+                || IsDeluxeProduceAnItem(animal);
+        }
+
+        public static bool IsAtLeastOneProduceAnItem(int defaultProduceIndex, int deluxeProduceIndex)
+        {
+            return IsProduceAnItem(defaultProduceIndex)
+                || IsProduceAnItem(deluxeProduceIndex);
+        }
+
+        public static bool IsDefaultProduceAnItem(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.IsProduceAnItem(animal.defaultProduceIndex.Value);
+        }
+
+        public static bool IsDeluxeProduceAnItem(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.IsProduceAnItem(animal.deluxeProduceIndex.Value);
+        }
+
+        public static bool IsProduceAnItem(int produceIndex)
+        {
+            return !produceIndex.Equals(Constants.FarmAnimal.NoProduce);
+        }
+
+        public static bool IsAProducer(global::StardewValley.FarmAnimal animal)
+        {
+            // Only animals that require a tool for harvst...
+            if (!Api.FarmAnimal.RequiresToolForHarvest(animal))
+            {
+                return true;
+            }
+
+            // ... and the harvest type is "-1" will never produce
+            return Api.FarmAnimal.IsToolUsedForHarvest(animal, Constants.FarmAnimal.NonProducerTool);
+        }
+
+        public static void SetCurrentProduce(global::StardewValley.FarmAnimal animal, int produceIndex)
+        {
+            animal.currentProduce.Value = produceIndex;
+        }
+
+        public static int RollProduce(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer)
+        {
+            return Api.FarmAnimal.RollDeluxeProduceChance(animal, Api.Farmer.GetDailyLuck(farmer))
+                ? Api.FarmAnimal.GetDeluxeProduce(animal)
+                : Api.FarmAnimal.GetDefaultProduce(animal);
+        }
+
+        public static bool RollDeluxeProduceChance(global::StardewValley.FarmAnimal animal, double luck)
+        {
+            if (Api.FarmAnimal.IsBaby(animal))
+            {
+                return false;
+            }
+
+            if (Api.FarmAnimal.IsProduceAnItem(animal.deluxeProduceIndex.Value))
+            {
+                return false;
+            }
+
+            double offset = 0.0d;
+            byte happiness = Api.FarmAnimal.GetHappiness(animal);
+            int friendship = Api.FarmAnimal.GetFriendship(animal);
+
+            if (happiness > 200)
+            {
+                offset = happiness * 1.5;
+            }
+            else if (happiness <= 100)
+            {
+                offset = happiness - 100;
+            }
+
+            if (Api.FarmAnimal.IsType(animal, Constants.VanillaFarmAnimalType.Duck))
+            {
+                return Helpers.Random.NextDouble() < (friendship + offset) / 5000.0 + luck * 0.01;
+            }
+
+            if (Api.FarmAnimal.IsType(animal, Constants.VanillaFarmAnimalType.Rabbit))
+            {
+                return Helpers.Random.NextDouble() < (friendship + offset) / 5000.0 + luck * 0.02;
+            }
+
+            if (friendship < 200)
+            {
+                return false;
+            }
+
+            return Helpers.Random.NextDouble() < (friendship + offset) / 1200.0;
+        }
+
+
+        /***
+         * Sounds and sprites
+         ***/
+
+        public static bool MakesSound(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.GetSound(animal) != null;
+        }
+
+        public static string GetSound(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.sound.Value;
+        }
+
+        public static string BuildSpriteAssetName(global::StardewValley.FarmAnimal animal)
+        {
+            string prefix = "";
+
+            if (Api.FarmAnimal.IsBaby(animal))
+            {
+                prefix = Constants.FarmAnimal.BabyPrefix;
+            }
+            else if (Api.FarmAnimal.IsSheared(animal))
+            {
+                prefix = Constants.FarmAnimal.ShearedPrefix;
+            }
+
+            string assetName = prefix + animal.type.Value;
+
+            // Check if the asset exists (ex. vanilla fails on BabyDuck)
+            if (!Api.Content.Exists<Texture2D>(Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName })))
+            {
+                // Covers the BabyDuck scenario by using BabyWhite Chicken
+                assetName = Api.FarmAnimal.GetDefaultType(animal);
+            }
+
+            return Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName });
+        }
+
+        public static AnimatedSprite CreateSprite(global::StardewValley.FarmAnimal animal)
+        {
+            return new AnimatedSprite(Api.FarmAnimal.BuildSpriteAssetName(animal), Constants.Content.StartingFrame, animal.frontBackSourceRect.Width, animal.frontBackSourceRect.Height);
+        }
+
+        public static void SetRandomFacingDirection(global::StardewValley.FarmAnimal animal)
+        {
+            animal.faceDirection(Helpers.Random.Next(4));
+        }
+
+        public static void AnimateFindingProduce(global::StardewValley.FarmAnimal animal)
+        {
+            int frame1, frame2;
+
+            switch (animal.FacingDirection)
+            {
+                case 0:
+                    frame1 = 9;
+                    frame2 = 11;
+                    break;
+                case 1:
+                    frame1 = 5;
+                    frame2 = 7;
+                    break;
+                case 2:
+                    frame1 = 1;
+                    frame2 = 2;
+                    break;
+                case 3:
+                default:
+                    frame1 = 5;
+                    frame2 = 7;
+                    break;
+            }
+
+            global::StardewValley.Farmer player = Api.Game.GetPlayer();
+            Delegate @delegate = Delegate.CreateDelegate(typeof(AnimatedSprite.endOfAnimationBehavior), player, Helpers.Reflection.GetMethod(animal, "findTruffle"));
+
+            List<FarmerSprite.AnimationFrame> animation = new List<FarmerSprite.AnimationFrame>()
+            {
+                new FarmerSprite.AnimationFrame(frame1, 250),
+                new FarmerSprite.AnimationFrame(frame2, 250),
+                new FarmerSprite.AnimationFrame(frame1, 250),
+                new FarmerSprite.AnimationFrame(frame2, 250),
+                new FarmerSprite.AnimationFrame(frame1, 250),
+                new FarmerSprite.AnimationFrame(frame2, 250, false, false, (AnimatedSprite.endOfAnimationBehavior)@delegate, false) // TODO: Validate this insanity.
+            };
+
+            animal.Sprite.setCurrentAnimation(animation);
+            animal.Sprite.loop = false;
+        }
+
+        public static int GetFacingDirection(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.FacingDirection;
+        }
+
+        public static Vector2 GetTileLocation(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.getTileLocation();
+        }
+
+        
+        /***
+         * States
+         ***/
+
+        public static global::StardewValley.FarmAnimal CreateFarmAnimal(string type, long ownerId, string name = null, Building home = null, long myId = default(long))
+        {
+            myId = myId.Equals(default(long)) ? Api.Game.GetNewId() : myId;
+
+            global::StardewValley.FarmAnimal animal = new global::StardewValley.FarmAnimal(type, myId, ownerId)
+            {
+                Name = name,
+                displayName = name,
+                home = home
+            };
+
+            return animal;
+        }
+
+        public static void Reload(global::StardewValley.FarmAnimal animal, Building home)
+        {
+            animal.reload(home);
+        }
+
+        public static void ReloadAll()
+        {
+            for (int index = 0; index < Game1.locations.Count; ++index)
+            {
+                if (!(Game1.locations[index] is Farm farm))
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < farm.buildings.Count; ++j)
+                {
+                    if (!(farm.buildings[j].indoors.Value is global::StardewValley.AnimalHouse animalHouse))
+                    {
+                        continue;
+                    }
+
+                    for (int k = 0; k < animalHouse.animalsThatLiveHere.Count(); ++k)
+                    {
+                        long id = animalHouse.animalsThatLiveHere.ElementAt(k);
+                        global::StardewValley.FarmAnimal animal = animalHouse.animals[id];
+
+                        Api.FarmAnimal.Reload(animal, animal.home);
+                    }
+                }
+
+                break;
+            }
+        }
+
+        public static void IncreasePathFindingThisTick(int amount = 1)
+        {
+            global::StardewValley.FarmAnimal.NumPathfindingThisTick += amount;
+        }
+
+        public static bool UnderMaxPathFindingPerTick()
+        {
+            return global::StardewValley.FarmAnimal.NumPathfindingThisTick < Constants.FarmAnimal.MaxPathFindingPerTick;
+        }
+
+
+        /***
+         * Types
+         ***/
+
+        public static string GetType(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.type.Value;
+        }
+
+        public static string GetDisplayType(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.displayType;
+        }
+
+        public static bool IsType(global::StardewValley.FarmAnimal animal, Constants.VanillaFarmAnimalType type)
+        {
+            return Api.FarmAnimal.IsType(animal, type.ToString());
+        }
+
+        public static bool IsType(global::StardewValley.FarmAnimal animal, string type)
+        {
+            return Api.FarmAnimal.IsType(animal.type.Value, type);
+        }
+
+        public static bool IsType(string source, string type)
+        {
+            return source.Equals(type);
+        }
+
+        public static string GetDefaultType(string buildingType)
+        {
+            return Api.FarmAnimal.GetDefaultType(buildingType.Equals(Constants.AnimalHouse.Coop));
+        }
+
+        public static string GetDefaultType(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.GetDefaultType(Api.FarmAnimal.IsCoopDweller(animal));
+        }
+
+        public static string GetDefaultType(bool isCoop)
+        {
+            return isCoop
+                ? Api.FarmAnimal.GetDefaultCoopDwellerType()
+                : Api.FarmAnimal.GetDefaultBarnDwellerType();
+        }
+
+        public static string GetDefaultCoopDwellerType()
+        {
+            return Constants.VanillaFarmAnimalType.WhiteChicken.ToString();
+        }
+
+        public static string GetDefaultBarnDwellerType()
+        {
+            return Constants.VanillaFarmAnimalType.WhiteCow.ToString();
+        }
+
         public static List<string> GetTypesFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)
         {
             List<string> potentialCategories = new List<string>();
@@ -202,7 +720,7 @@ namespace Paritee.StardewValley.Core.Api
             // Someone could have the data set up, but not add it to BFAV so that
             // it's hidden from the game so we must use BFAV's restrictions
             Dictionary<string, string> contentData = Api.Content.LoadData<string, string>(Constants.Content.DataFarmAnimalsContentPath);
-            
+
             foreach (KeyValuePair<string, List<string>> entry in restrictions)
             {
                 foreach (string type in entry.Value)
@@ -212,7 +730,7 @@ namespace Paritee.StardewValley.Core.Api
                     int defaultProduceId = Int32.Parse(values[(int)Constants.FarmAnimal.DataValueIndex.DefaultProduce]);
                     int deluxeProduceId = Int32.Parse(values[(int)Constants.FarmAnimal.DataValueIndex.DeluxeProduce]);
 
-                    if (Api.FarmAnimal.ProducesAtLeastOne(defaultProduceId, deluxeProduceId, produceIndexes))
+                    if (Api.FarmAnimal.HasProduceThatMatchesAtLeastOne(defaultProduceId, deluxeProduceId, produceIndexes))
                     {
                         potentialTypes.Add(type);
                         potentialCategories.Add(entry.Key);
@@ -223,64 +741,10 @@ namespace Paritee.StardewValley.Core.Api
             return potentialTypes;
         }
 
-        public static bool ProducesAll(global::StardewValley.FarmAnimal animal, int[] targets)
+        public static string GetRandomTypeFromProduce(global::StardewValley.FarmAnimal animal, Dictionary<string, List<string>> restrictions)
         {
-            // Intersection length should match target length
-            return Api.FarmAnimal.ProducesAll(animal.defaultProduceIndex.Value, animal.deluxeProduceIndex.Value, targets);
-        }
-
-        public static bool ProducesAll(int defaultProduceId, int deluxeProduceId, int[] targets)
-        {
-            int[] produceIndexes = new int[] { defaultProduceId, deluxeProduceId };
-
-            // Intersection length should not change
-            return produceIndexes.Intersect(targets)
-                .Count().Equals(produceIndexes.Length);
-        }
-
-        public static bool ProducesAtLeastOne(global::StardewValley.FarmAnimal animal, int[] targets)
-        {
-            return Api.FarmAnimal.ProducesAtLeastOne(animal.defaultProduceIndex.Value, animal.deluxeProduceIndex.Value, targets);
-        }
-
-        public static bool ProducesAtLeastOne(int defaultProduceId, int deluxeProduceId, int[] targets)
-        {
-            // Must actualy be a product
-            return targets.Where(o => !Api.FarmAnimal.ProducesNothing(o))
-                .Intersect(new int[] { defaultProduceId, deluxeProduceId })
-                .Any();
-        }
-
-        public static bool ProducesNothing(global::StardewValley.FarmAnimal animal)
-        {
-            return Api.FarmAnimal.ProducesNothing(animal.defaultProduceIndex.Value, animal.deluxeProduceIndex.Value);
-        }
-
-        public static bool ProducesNothing(int defaultProduceIndex, int deluxeProduceIndex)
-        {
-            return Api.FarmAnimal.ProducesNothing(defaultProduceIndex) && Api.FarmAnimal.ProducesNothing(deluxeProduceIndex);
-        }
-
-        public static bool ProducesNothing(int produceIndex)
-        {
-            return produceIndex.Equals(Constants.FarmAnimal.NoProduce);
-        }
-
-        public static bool SearchesForProduce(global::StardewValley.FarmAnimal animal)
-        {
-            return Api.FarmAnimal.SearchesForProduce(animal.harvestType.Value, animal.toolUsedForHarvest.Value);
-        }
-
-        public static bool SearchesForProduce(int harvestType, string harvestTool)
-        {
-            return Api.FarmAnimal.RequiresToolForHarvest(harvestType)
-                && (Api.FarmAnimal.IsDataValueNull(harvestTool));
-        }
-
-        public static bool IsMale(global::StardewValley.FarmAnimal animal)
-        {
-            // TODO: expand on this
-            return animal.isMale();
+            // Use the produce to find other potentials
+            return GetRandomTypeFromProduce(new int[] { Api.FarmAnimal.GetDefaultProduce(animal), Api.FarmAnimal.GetDeluxeProduce(animal) }, restrictions);
         }
 
         public static string GetRandomTypeFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)
@@ -298,47 +762,6 @@ namespace Paritee.StardewValley.Core.Api
         public static string GetRandomTypeFromProduce(int produceIndex, Dictionary<string, List<string>> restrictions)
         {
             return Api.FarmAnimal.GetRandomTypeFromProduce(new int[] { produceIndex }, restrictions);
-        }
-
-        public static string GetRandomTypeFromParent(global::StardewValley.FarmAnimal parent, Dictionary<string, List<string>> restrictions)
-        {
-            // Use the parent's produce to find other potentials
-            return GetRandomTypeFromProduce(new int[] { parent.defaultProduceIndex.Value, parent.defaultProduceIndex.Value }, restrictions);
-        }
-
-        public static bool CanLiveIn(global::StardewValley.FarmAnimal animal, Building building)
-        {
-            return building.buildingType.Value.Contains(animal.buildingTypeILiveIn.Value);
-        }
-
-        public static void SetHome(ref global::StardewValley.FarmAnimal animal, Building home)
-        {
-            animal.home = home;
-            animal.homeLocation.Value = home == null ? default(Vector2) : new Vector2(home.tileX.Value, home.tileY.Value);
-        }
-
-        public static bool SetRandomPositionInHome(ref global::StardewValley.FarmAnimal animal)
-        {
-            if (animal.home == null)
-            {
-                return false;
-            }
-
-            animal.setRandomPosition(animal.home.indoors.Value);
-
-            return true;
-        }
-
-        public static void AddToBuilding(ref global::StardewValley.FarmAnimal animal, ref Building building)
-        {
-            Api.FarmAnimal.SetHome(ref animal, building);
-            Api.FarmAnimal.SetRandomPositionInHome(ref animal);
-            Api.AnimalHouse.AddAnimal(ref building, animal);
-        }
-
-        public static void AssociateParent(ref global::StardewValley.FarmAnimal animal, long parentId)
-        {
-            animal.parentId.Value = parentId;
         }
 
         public static bool BlueChickenIsUnlocked(global::StardewValley.Farmer farmer)
@@ -370,45 +793,19 @@ namespace Paritee.StardewValley.Core.Api
             return types;
         }
 
-        public static bool HasHarvestType(global::StardewValley.FarmAnimal animal, int harvestType)
+
+        /***
+         * Vanilla
+         ***/
+
+        public static bool IsVanilla(global::StardewValley.FarmAnimal animal)
         {
-            return animal.harvestType.Value.Equals(harvestType);
+            return Api.FarmAnimal.IsVanilla(Api.FarmAnimal.GetType(animal));
         }
 
-        public static bool HasHarvestType(int harvestType, int target)
+        public static bool IsVanilla(string type)
         {
-            return harvestType.Equals(target);
-        }
-
-        public static bool CanBeNamed(global::StardewValley.FarmAnimal animal)
-        {
-            // "It" harvest type doesn't allow you to name the animal. This is 
-            // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.ItHarvestType);
-        }
-
-        public static bool RequiresToolForHarvest(global::StardewValley.FarmAnimal animal)
-        {
-            // "It" harvest type doesn't allow you to name the animal. This is 
-            // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.RequiresToolHarvestType);
-        }
-
-        public static bool RequiresToolForHarvest(int harvestType)
-        {
-            // "It" harvest type doesn't allow you to name the animal. This is 
-            // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(harvestType, Constants.FarmAnimal.RequiresToolHarvestType);
-        }
-
-        public static bool MakesSound(global::StardewValley.FarmAnimal animal)
-        {
-            return animal.sound.Value != null;
-        }
-
-        public static string GetToolUsedForHarvest(global::StardewValley.FarmAnimal animal)
-        {
-            return animal.toolUsedForHarvest.Value.Length > 0 ? animal.toolUsedForHarvest.Value : default(string);
+            return Constants.VanillaFarmAnimalType.Exists(type);
         }
     }
 }

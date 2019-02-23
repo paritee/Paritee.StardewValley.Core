@@ -57,7 +57,11 @@
     <Compile Include="Api\Farmer.cs" />
     <Compile Include="Api\Game.cs" />
     <Compile Include="Api\Location.cs" />
+    <Compile Include="Api\Menu.cs" />
     <Compile Include="Api\Mod.cs" />
+    <Compile Include="Api\PurchaseAnimalsMenu.cs" />
+    <Compile Include="Api\Season.cs" />
+    <Compile Include="Api\Weather.cs" />
     <Compile Include="Constants\AnimalHouse.cs" />
     <Compile Include="Constants\AnimalShop.cs" />
     <Compile Include="Constants\Blueprint.cs" />
@@ -65,6 +69,7 @@
     <Compile Include="Constants\Event.cs" />
     <Compile Include="Constants\FarmAnimal.cs" />
     <Compile Include="Constants\Mod.cs" />
+    <Compile Include="Constants\Environment.cs" />
     <Compile Include="Constants\VanillaFarmAnimalCategory.cs" />
     <Compile Include="Constants\VanillaFarmAnimalType.cs" />
     <Compile Include="Helpers\Constants.cs" />

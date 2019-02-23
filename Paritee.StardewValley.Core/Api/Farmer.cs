@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using StardewValley;
+using StardewValley.Buildings;
+using System.Linq;
 
 namespace Paritee.StardewValley.Core.Api
 {
@@ -28,5 +30,31 @@ namespace Paritee.StardewValley.Core.Api
         {
             return farmer.questLog.Where(o => o.id.Value.Equals(questId) && o.completed.Value).Any();
         }
+
+        public static int GetLuckLevel(global::StardewValley.Farmer farmer)
+        {
+            return farmer.LuckLevel;
+        }
+
+        public static double GetDailyLuck(global::StardewValley.Farmer farmer)
+        {
+            return Api.Game.GetDailyLuck() + Api.Farmer.GetLuckLevel(farmer);
+        }
+
+        public static GameLocation GetCurrentLocation(global::StardewValley.Farmer farmer)
+        {
+            return farmer.currentLocation;
+        }
+
+        public static bool IsCurrentLocation(global::StardewValley.Farmer farmer, GameLocation location)
+        {
+            return Api.Location.IsLocation(Api.Farmer.GetCurrentLocation(farmer), location);
+        }
+
+        public static global::StardewValley.FarmAnimal CreateFarmAnimal(global::StardewValley.Farmer farmer,  string type, string name = null, Building home = null, long myId = default(long))
+        {
+            return Api.FarmAnimal.CreateFarmAnimal(type, Api.Farmer.GetUniqueId(farmer), name, home, myId);
+        }
+
     }
 }
