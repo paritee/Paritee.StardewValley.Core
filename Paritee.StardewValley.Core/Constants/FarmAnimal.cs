@@ -2,20 +2,24 @@
 {
     public class FarmAnimal
     {
-        // Sprites
-        public const string BabyPrefix = "Baby";
-        public const string ShearedPrefix = "Sheared";
+        // Harvest types
+        public const int AutomaticHarvestType = 0;
+        public const int RequiresToolHarvestType = 1;
+        public const int ItHarvestType = 2; // Only used by Hog in Vanilla
+
+        // Produce
+        public const int NoProduce = default(int);
+        public static string NonProducerTool { get { return default(int).ToString(); } }
 
         // Events
         public const double BlueChickenChance = 0.25;
 
-        // Produce
-        public const int NoProduce = default(int);
+        // Sprites
+        public const string BabyPrefix = "Baby";
+        public const string ShearedPrefix = "Sheared";
 
-        // Harvest types
-        public const int AutomaticHarvestType = 0;
-        public const int RequiresToolHarvestType = 1;
-        public const int ItHarvestType = 2;
+        // Paths
+        public static int MaxPathFindingPerTick { get { return global::StardewValley.FarmAnimal.MaxPathfindingPerTick; } }
 
         public enum DataValueIndex
         {
