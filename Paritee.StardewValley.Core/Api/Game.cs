@@ -28,9 +28,19 @@ namespace Paritee.StardewValley.Core.Api
             return Game1.getFarm();
         }
 
+        public static double GetDailyLuck()
+        {
+            return Game1.dailyLuck;
+        }
+
         public static GameLocation GetCurrentLocation()
         {
             return Game1.currentLocation;
+        }
+
+        public static bool IsCurrentLocation(GameLocation location)
+        {
+            return Api.Location.IsLocation(Api.Game.GetCurrentLocation(), location);
         }
 
         public static bool IsSaveLoaded()
@@ -75,6 +85,16 @@ namespace Paritee.StardewValley.Core.Api
             {
                 Game1.CustomData.Remove(key);
             }
+        }
+
+        public static int GetDaysPlayed()
+        {
+            return (int)Game1.stats.DaysPlayed;
+        }
+
+        public static int GetTimeOfDay(bool afterFade = false)
+        {
+            return afterFade ? Game1.timeOfDayAfterFade : Game1.timeOfDay;
         }
     }
 }
