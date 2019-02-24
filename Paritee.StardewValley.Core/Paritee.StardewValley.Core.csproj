@@ -78,7 +78,6 @@
     <Compile Include="Models\FarmAnimalCategory.cs" />
     <Compile Include="Models\FarmAnimalType.cs" />
     <Compile Include="Models\PropertyConstant.cs" />
-    <Compile Include="Models\SaveData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -17,6 +17,18 @@ namespace Paritee.StardewValley.Core.Api
             return $"smapi/mod-data/{uniqueModId}/{key}";
         }
 
+        public static T ReadSaveData<T>(string uniqueModId, string key) where T : new()
+        {
+            T data = Api.Game.ReadSaveData<T>(Api.Mod.SmapiSaveDataKey(uniqueModId, key));
+
+            return data == null ? new T() : data;
+        }
+
+        public static void WriteSaveData<T>(string uniqueModId, string key, T data)
+        {
+            Api.Game.WriteSaveData<T>(Api.Mod.SmapiSaveDataKey(uniqueModId, key), data);
+        }
+
         public static T ReadConfig<T>(string modPath, string fileName)
         {
             string path = Path.Combine(modPath, fileName);
