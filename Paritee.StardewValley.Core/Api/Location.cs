@@ -44,7 +44,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsLocation(GameLocation location, GameLocation target)
         {
-            return location.Equals(target);
+            return location == target;
         }
     }
 }

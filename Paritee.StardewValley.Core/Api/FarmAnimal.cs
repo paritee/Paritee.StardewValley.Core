@@ -119,7 +119,7 @@ namespace Paritee.StardewValley.Core.Api
 
         private static bool IsDataValueNull(string value)
         {
-            return value.Equals(null) || value.Equals("null") || value.Equals(default(string)) || value.Equals("") || value.Equals(Constants.Content.None);
+            return value == null || value == "null" || value == default(string) || value == "" || value == Constants.Content.None;
         }
 
 
@@ -214,12 +214,12 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool HasHarvestType(global::StardewValley.FarmAnimal animal, int harvestType)
         {
-            return animal.harvestType.Value.Equals(harvestType);
+            return animal.harvestType.Value == harvestType;
         }
 
         public static bool HasHarvestType(int harvestType, int target)
         {
-            return harvestType.Equals(target);
+            return harvestType == target;
         }
 
         public static void FindProduce(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer)
@@ -273,7 +273,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsToolUsedForHarvest(string tool, string target)
         {
-            return tool.Equals(target);
+            return tool == target;
         }
 
 
@@ -434,8 +434,8 @@ namespace Paritee.StardewValley.Core.Api
             int[] produceIndexes = new int[] { defaultProduceId, deluxeProduceId };
 
             // Intersection length should not change
-            return produceIndexes.Intersect(targets)
-                .Count().Equals(produceIndexes.Length);
+            return produceIndexes.Intersect(targets).Count()
+                .Equals(produceIndexes.Length);
         }
 
         public static bool HasProduceThatMatchesAtLeastOne(global::StardewValley.FarmAnimal animal, int[] targets)
@@ -487,7 +487,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsProduceAnItem(int produceIndex)
         {
-            return !produceIndex.Equals(Constants.FarmAnimal.NoProduce);
+            return !(produceIndex == Constants.FarmAnimal.NoProduce);
         }
 
         public static bool IsAProducer(global::StardewValley.FarmAnimal animal)
@@ -675,7 +675,10 @@ namespace Paritee.StardewValley.Core.Api
 
         public static global::StardewValley.FarmAnimal CreateFarmAnimal(string type, long ownerId, string name = null, Building home = null, long myId = default(long))
         {
-            myId = myId.Equals(default(long)) ? Api.Game.GetNewId() : myId;
+            if (myId == default(long))
+            {
+                myId = Api.Game.GetNewId();
+            }
 
             global::StardewValley.FarmAnimal animal = new global::StardewValley.FarmAnimal(type, myId, ownerId)
             {
@@ -765,12 +768,12 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsType(string source, string type)
         {
-            return source.Equals(type);
+            return source == type;
         }
 
         public static string GetDefaultType(string buildingType)
         {
-            return Api.FarmAnimal.GetDefaultType(buildingType.Equals(Constants.AnimalHouse.Coop));
+            return Api.FarmAnimal.GetDefaultType(buildingType == Constants.AnimalHouse.Coop);
         }
 
         public static string GetDefaultType(global::StardewValley.FarmAnimal animal)

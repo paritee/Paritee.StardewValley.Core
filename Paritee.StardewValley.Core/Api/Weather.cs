@@ -11,7 +11,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsWeather(int weather, int target)
         {
-            return weather.Equals(target);
+            return weather == target;
         }
 
         public static int GetToday()
