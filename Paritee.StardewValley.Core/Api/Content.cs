@@ -59,13 +59,18 @@ namespace Paritee.StardewValley.Core.Api
 
         public static KeyValuePair<T, U> GetDataEntry<T, U>(Dictionary<T, U> data, T id)
         {
-            return data.First(kvp => kvp.Key.Equals(id));
+            return data.FirstOrDefault(kvp => kvp.Key.Equals(id));
         }
 
         public static U GetDataValue<T, U>(string path, T id, int index)
         {
             Dictionary<T, U> data = Api.Content.LoadData<T, U>(Constants.Content.DataBlueprintsContentPath);
             KeyValuePair<T, U> entry = Api.Content.GetDataEntry<T, U>(data, id);
+
+            if (entry.Key.Equals(default(T)))
+            {
+                return default(U);
+            }
 
             return (U)System.Convert.ChangeType(Api.Content.ParseDataValue(entry.Value.ToString())[index], typeof(U));
         }
