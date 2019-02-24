@@ -94,5 +94,30 @@ namespace Paritee.StardewValley.Core.Api
         {
             return animalHouse.getBuilding();
         }
+
+        public static void SetCurrentEvent(global::StardewValley.AnimalHouse animalHouse, global::StardewValley.Event currentEvent)
+        {
+            animalHouse.currentEvent = currentEvent;
+        }
+
+        public static global::StardewValley.Event GetCurrentEvent(global::StardewValley.AnimalHouse animalHouse)
+        {
+            return animalHouse.currentEvent;
+        }
+
+        public static global::StardewValley.Event GetIncubatorHatchEvent(global::StardewValley.AnimalHouse animalHouse, string message = null)
+        {
+            // Use the same messaging for all types of "eggs"
+            string str = message ?? Paritee.StardewValley.Core.Api.Content.LoadString("Strings\\Locations:AnimalHouse_Incubator_Hatch_RegularEgg");
+
+            return new global::StardewValley.Event("none/-1000 -1000/farmer 2 9 0/pause 250/message \"" + str + "\"/pause 500/animalNaming/pause 500/end");
+        }
+
+        public static void SetIncubatorHatchEvent(global::StardewValley.AnimalHouse animalHouse)
+        {
+            global::StardewValley.Event hatchEvent = Api.AnimalHouse.GetIncubatorHatchEvent(animalHouse);
+
+            Api.AnimalHouse.SetCurrentEvent(animalHouse, hatchEvent);
+        }
     }
 }
