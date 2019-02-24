@@ -52,6 +52,7 @@
     <Compile Include="Api\AnimalShop.cs" />
     <Compile Include="Api\BellsAndWhistles.cs" />
     <Compile Include="Api\Content.cs" />
+    <Compile Include="Api\Dialogue.cs" />
     <Compile Include="Api\Event.cs" />
     <Compile Include="Api\FarmAnimal.cs" />
     <Compile Include="Api\Farmer.cs" />
