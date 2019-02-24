@@ -67,6 +67,7 @@
     <Compile Include="Constants\AnimalShop.cs" />
     <Compile Include="Constants\Blueprint.cs" />
     <Compile Include="Constants\Content.cs" />
+    <Compile Include="Constants\Currency.cs" />
     <Compile Include="Constants\Event.cs" />
     <Compile Include="Constants\FarmAnimal.cs" />
     <Compile Include="Constants\Mod.cs" />

@@ -1,19 +1,51 @@
 ﻿using StardewValley;
 using StardewValley.Buildings;
+using System;
 using System.Linq;
 
 namespace Paritee.StardewValley.Core.Api
 {
     public class Farmer
     {
-        public static bool CanAfford(global::StardewValley.Farmer farmer, int amount)
+        public static bool CanAfford(global::StardewValley.Farmer farmer, int amount, Constants.Currency.Type currency = Constants.Currency.Type.Money)
         {
-            return farmer.Money >= amount;
+            switch(currency)
+            {
+                case Constants.Currency.Type.Money:
+                    return farmer.Money >= amount;
+
+                case Constants.Currency.Type.FestivalScore:
+                    return farmer.festivalScore >= amount;
+
+                case Constants.Currency.Type.ClubCoins:
+                    return farmer.clubCoins >= amount;
+
+                default:
+                    return false;
+            }
+        }
+
+        public static void Spend(global::StardewValley.Farmer farmer, int amount, Constants.Currency.Type currency)
+        {
+            switch (currency)
+            {
+                case Constants.Currency.Type.Money:
+                    farmer.Money = Math.Max(Constants.Currency.MinimumAmount, farmer.Money - amount);
+                    break;
+
+                case Constants.Currency.Type.FestivalScore:
+                    farmer.festivalScore = Math.Max(Constants.Currency.MinimumAmount, farmer.festivalScore - amount);
+                    break;
+
+                case Constants.Currency.Type.ClubCoins:
+                    farmer.clubCoins = Math.Max(Constants.Currency.MinimumAmount, farmer.clubCoins - amount);
+                    break;
+            }
         }
 
         public static void SpendMoney(global::StardewValley.Farmer farmer, int amount)
         {
-            farmer.Money -= amount;
+            Api.Farmer.Spend(farmer, amount, Constants.Currency.Type.Money);
         }
 
         public static long GetUniqueId(global::StardewValley.Farmer farmer)

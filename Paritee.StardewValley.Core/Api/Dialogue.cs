@@ -1,6 +1,6 @@
 ﻿namespace Paritee.StardewValley.Core.Api
 {
-    class Dialogue
+    public class Dialogue
     {
         public static string GetRandomName()
         {
