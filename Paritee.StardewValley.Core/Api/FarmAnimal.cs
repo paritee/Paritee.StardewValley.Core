@@ -32,7 +32,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static void AssociateParent(global::StardewValley.FarmAnimal animal, global::StardewValley.FarmAnimal parent)
         {
-            Api.FarmAnimal.AssociateParent(animal, Api.FarmAnimal.GetId(parent));
+            Api.FarmAnimal.AssociateParent(animal, Api.FarmAnimal.GetUniqueId(parent));
         }
 
         public static void AssociateParent(global::StardewValley.FarmAnimal animal, long parentId)
@@ -316,7 +316,7 @@ namespace Paritee.StardewValley.Core.Api
          * IDs
          ***/
 
-        public static long GetId(global::StardewValley.FarmAnimal animal)
+        public static long GetUniqueId(global::StardewValley.FarmAnimal animal)
         {
             return animal.myID.Value;
         }
@@ -592,6 +592,15 @@ namespace Paritee.StardewValley.Core.Api
             return animal.getTileLocation();
         }
 
+        public static bool HasController(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.controller != null;
+        }
+
+        public static Rectangle GetBoundingBox(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.GetBoundingBox();
+        }
         
         /***
          * States
