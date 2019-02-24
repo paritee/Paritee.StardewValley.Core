@@ -11,6 +11,11 @@
         public const int NoProduce = default(int);
         public static string NonProducerTool { get { return default(int).ToString(); } }
 
+        // Health, happiness and fullness
+        public const int DefaultHealth = 3;
+        public const byte MaxHappiness = byte.MaxValue;
+        public const byte MaxFullness = byte.MaxValue;
+
         // Events
         public const double BlueChickenChance = 0.25;
 

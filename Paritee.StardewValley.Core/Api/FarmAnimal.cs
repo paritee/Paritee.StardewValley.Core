@@ -45,8 +45,30 @@ namespace Paritee.StardewValley.Core.Api
          * Data
          ***/
 
-        public static void UpdateFromData(global::StardewValley.FarmAnimal animal, KeyValuePair<string, string> contentDataEntry)
+        public static void UpdateFromData(global::StardewValley.FarmAnimal animal, string type)
         {
+            // Grab the new type's data to override if it exists
+            Dictionary<string, string> contentData = Api.Content.LoadData<string, string>(Constants.Content.DataFarmAnimalsContentPath);
+            KeyValuePair<string, string> contentDataEntry = Api.Content.GetDataEntry<string, string>(contentData, type);
+
+            // Always validate if the type we're trying to use exists
+            if (contentDataEntry.Key == null)
+            {
+                // Get a default type to use
+                string defaultType = Api.FarmAnimal.GetDefaultType(animal);
+
+                // Set it to the default before we continue
+                contentDataEntry = contentData.FirstOrDefault(kvp => kvp.Key.Equals(defaultType));
+
+                // Do a final check to make sure the default exists; otherwise 
+                // we need to kill everything. This should never happen unless 
+                // agressive mods are being used to REMOVE vanilla animals.
+                if (contentDataEntry.Key == null)
+                {
+                    throw new KeyNotFoundException($"Could not find {defaultType} to overwrite custom farm animal for saving. This is a fatal error. Please make sure you have {defaultType} in the game.");
+                }
+            }
+
             string[] values = Api.Content.ParseDataValue(contentDataEntry.Value);
 
             // Reset the instance's values based on the new type
@@ -127,12 +149,17 @@ namespace Paritee.StardewValley.Core.Api
 
 
         /***
-         * Fullness
+         * Fullness and health
          ***/
 
         public static byte GetFullness(global::StardewValley.FarmAnimal animal)
         {
             return animal.fullness.Value;
+        }
+
+        public static void SetFullness(global::StardewValley.FarmAnimal animal, byte fullness)
+        {
+            animal.fullness.Value = fullness;
         }
 
         public static void SetFindGrassPathController(global::StardewValley.FarmAnimal animal, GameLocation location)
@@ -150,6 +177,16 @@ namespace Paritee.StardewValley.Core.Api
             Helpers.Reflection.GetField(animal, "isEating").SetValue(animal, new NetBool(false));
         }
 
+        public static void SetHealth(global:: StardewValley.FarmAnimal animal, int health)
+        {
+            animal.health.Value = health;
+        }
+
+        public static int GetHealth(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.health.Value;
+        }
+
 
         /***
          * Happiness
@@ -158,6 +195,11 @@ namespace Paritee.StardewValley.Core.Api
         public static byte GetHappiness(global::StardewValley.FarmAnimal animal)
         {
             return animal.happiness.Value;
+        }
+
+        public static void SetHappiness(global::StardewValley.FarmAnimal animal, byte happiness)
+        {
+            animal.happiness.Value = happiness;
         }
 
 
@@ -260,7 +302,7 @@ namespace Paritee.StardewValley.Core.Api
                 ? animal.home.buildingType.Value
                 : animal.buildingTypeILiveIn.Value;
 
-            return buildingType.Contains(Constants.AnimalHouse.Coop);
+            return buildingType == null ? false : buildingType.Contains(Constants.AnimalHouse.Coop);
         }
 
         public static bool CanLiveIn(global::StardewValley.FarmAnimal animal, Building building)
@@ -316,6 +358,11 @@ namespace Paritee.StardewValley.Core.Api
          * IDs
          ***/
 
+        public static void SetUniqueId(global::StardewValley.FarmAnimal animal, long id)
+        {
+            animal.myID.Value = id;
+        }
+
         public static long GetUniqueId(global::StardewValley.FarmAnimal animal)
         {
             return animal.myID.Value;
@@ -326,6 +373,11 @@ namespace Paritee.StardewValley.Core.Api
             return animal.ownerID.Value;
         }
 
+        public static void SetOwner(global::StardewValley.FarmAnimal animal, long id)
+        {
+            animal.ownerID.Value = id;
+        }
+
         public static string GetName(global::StardewValley.FarmAnimal animal)
         {
             return animal.Name;
@@ -334,6 +386,21 @@ namespace Paritee.StardewValley.Core.Api
         public static bool HasName(global::StardewValley.FarmAnimal animal)
         {
             return Api.FarmAnimal.GetName(animal) != null;
+        }
+
+        public static string SetRandomName(global::StardewValley.FarmAnimal animal)
+        {
+            string name = Api.Dialogue.GetRandomName();
+
+            Api.FarmAnimal.SetName(animal, name);
+
+            return name;
+        }
+
+        public static void SetName(global::StardewValley.FarmAnimal animal, string name)
+        {
+            animal.Name = name;
+            animal.displayName = name;
         }
 
 
@@ -617,6 +684,8 @@ namespace Paritee.StardewValley.Core.Api
                 home = home
             };
 
+            Api.FarmAnimal.UpdateFromData(animal, type);
+
             return animal;
         }
 
@@ -668,6 +737,11 @@ namespace Paritee.StardewValley.Core.Api
         /***
          * Types
          ***/
+
+        public static void SetType(global::StardewValley.FarmAnimal animal, string type)
+        {
+            animal.type.Value = type;
+        }
 
         public static string GetType(global::StardewValley.FarmAnimal animal)
         {
@@ -759,7 +833,6 @@ namespace Paritee.StardewValley.Core.Api
         public static string GetRandomTypeFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)
         {
             List<string> potentialTypes = Api.FarmAnimal.GetTypesFromProduce(produceIndexes, restrictions);
-
             int index = Helpers.Random.Next(potentialTypes.Count);
 
             // Check to make sure types came back
