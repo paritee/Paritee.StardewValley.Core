@@ -7,7 +7,7 @@
         public const string None = "none";
         public const int StartingFrame = 0;
 
-        public static string DataFarmAnimalsContentPath { get { return Api.Content.BuildPath(new string[] { "Data", "FarmAnimals" }); } }
-        public static string DataBlueprintsContentPath { get { return Api.Content.BuildPath(new string[] { "Data", "Blueprints" }); } }
+        public static string DataFarmAnimalsContentPath => Api.Content.BuildPath(new string[] { "Data", "FarmAnimals" });
+        public static string DataBlueprintsContentPath => Api.Content.BuildPath(new string[] { "Data", "Blueprints" });
     }
 }

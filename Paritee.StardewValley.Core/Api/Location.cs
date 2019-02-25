@@ -27,7 +27,7 @@ namespace Paritee.StardewValley.Core.Api
             return location.IsOutdoors;
         }
 
-        public static void SpawnObject(GameLocation location, Vector2 tileLocation, Object obj)
+        public static void SpawnObject(GameLocation location, Vector2 tileLocation, global::StardewValley.Object obj)
         {
             Utility.spawnObjectAround(tileLocation, obj, location);
         }

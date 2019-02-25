@@ -1,7 +1,10 @@
-﻿using Netcode;
+﻿using Microsoft.Xna.Framework;
+using Netcode;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Objects;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Paritee.StardewValley.Core.Api
 {
@@ -17,20 +20,26 @@ namespace Paritee.StardewValley.Core.Api
             return $"{size.ToString()} {buildingName}";
         }
 
-        public static Object GetIncubator(global::StardewValley.AnimalHouse animalHouse)
+        public static List<global::StardewValley.Object> GetIncubators(global::StardewValley.AnimalHouse animalHouse)
         {
-            foreach (Object @object in animalHouse.objects.Values)
-            {
-                if (@object.bigCraftable.Value && @object.Name.Contains(Constants.AnimalHouse.Incubator) && (@object.heldObject.Value != null && @object.MinutesUntilReady <= 0) && !animalHouse.isFull())
-                {
-                    return @object;
-                }
-            }
-
-            return null;
+            return animalHouse.objects.Values.Where(o => Api.Object.IsIncubator(o)).ToList();
         }
 
-        public static string GetRandomTypeFromIncubator(Object incubator, Dictionary<string, List<string>> restrictions)
+        public static global::StardewValley.Object GetIncubatorWithEggReadyToHatch(global::StardewValley.AnimalHouse animalHouse)
+        {
+            List<global::StardewValley.Object> incubators = Api.AnimalHouse.GetIncubators(animalHouse);
+
+            if (!incubators.Any())
+            {
+                // Can't do anything about it
+                return null;
+            }
+
+            // Try to get the first incubator that has an egg ready to hatch
+            return incubators.FirstOrDefault(o => Api.Object.IsHoldingObject(o) && Api.Object.IsReady(o));
+        }
+
+        public static string GetRandomTypeFromIncubator(global::StardewValley.Object incubator, Dictionary<string, List<string>> restrictions)
         {
             // Search for a type by the produce
             return incubator.heldObject.Value == null
@@ -44,10 +53,10 @@ namespace Paritee.StardewValley.Core.Api
             animalHouse.incubatingEgg.Y = -1;
         }
 
-        public static void ResetIncubator(global::StardewValley.AnimalHouse animalHouse, Object incubator)
+        public static void ResetIncubator(global::StardewValley.AnimalHouse animalHouse, global::StardewValley.Object incubator)
         {
-            incubator.heldObject.Value = (Object)null;
-            incubator.ParentSheetIndex = Constants.AnimalHouse.DefaultIncubatorItem;
+            incubator.heldObject.Value = null;
+            incubator.ParentSheetIndex = Constants.AnimalHouse.DefaultIncubatorItemIndex;
 
             Api.AnimalHouse.ResetIncubator(animalHouse);
         }
@@ -118,6 +127,58 @@ namespace Paritee.StardewValley.Core.Api
             global::StardewValley.Event hatchEvent = Api.AnimalHouse.GetIncubatorHatchEvent(animalHouse);
 
             Api.AnimalHouse.SetCurrentEvent(animalHouse, hatchEvent);
+        }
+
+        public static void AutoGrabFromAnimals(global::StardewValley.AnimalHouse animalHouse, global::StardewValley.Object autoGrabber)
+        {
+            foreach (KeyValuePair<long, global::StardewValley.FarmAnimal> pair in animalHouse.animals.Pairs)
+            {
+                // Skip non-producers
+                if (!Api.FarmAnimal.IsAProducer(pair.Value))
+                {
+                    continue;
+                }
+
+                // Must require a tool for harvest, ..
+                if (!Api.FarmAnimal.RequiresToolForHarvest(pair.Value))
+                {
+                    continue;
+                }
+
+                // .. be currently producing an item (ex. not a baby) ..
+                if (!Api.FarmAnimal.IsCurrentlyProducing(pair.Value))
+                {
+                    continue;
+                }
+
+                // .. and must not be an animal that finds its produce (ex. Pigs)
+                // This is the logic check where previously it validated solely 
+                // against Truffles. This may not always be the case.
+                if (Api.FarmAnimal.CanFindProduce(pair.Value))
+                {
+                    continue;
+                }
+
+                if (autoGrabber.heldObject.Value != null && autoGrabber.heldObject.Value is Chest chest)
+                {
+                    Item item = (Item)new global::StardewValley.Object(Vector2.Zero, Api.FarmAnimal.GetCurrentProduce(pair.Value), null, false, true, false, false)
+                    {
+                        Quality = Api.FarmAnimal.GetProduceQuality(pair.Value)
+                    };
+
+                    if (chest.addItem(item) == null)
+                    {
+                        Api.FarmAnimal.SetCurrentProduce(pair.Value, Constants.FarmAnimal.NoProduce);
+
+                        if (Api.FarmAnimal.IsSheared(pair.Value))
+                        {
+                            Api.FarmAnimal.ReloadSpriteTexture(pair.Value);
+                        }
+
+                        autoGrabber.showNextIndex.Value = true;
+                    }
+                }
+            }
         }
     }
 }

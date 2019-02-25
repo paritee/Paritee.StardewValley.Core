@@ -10,6 +10,11 @@ namespace Paritee.StardewValley.Core.Api
             return Game1.currentSeason;
         }
 
+        public static int ConvertToNumber(string season)
+        {
+            return global::StardewValley.Utility.getSeasonNumber(season);
+        }
+
         public static bool IsSpring()
         {
             return Game1.IsSpring || Api.Season.IsCurrentSeason(Constants.Environment.Season.Spring);

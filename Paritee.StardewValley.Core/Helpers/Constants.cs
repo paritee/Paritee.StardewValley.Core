@@ -9,7 +9,7 @@ namespace Paritee.StardewValley.Core.Constants
         public const string ModKey = "paritee.Paritee.StardewValley.Core";
         public const string ConfigFileName = "config.json";
         public const string FarmAnimalsSaveDataFileName = "farmanimals.json";
-        public static string ModPath { get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); } }
+        public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         // FarmAnimal
         public const string BabyPrefix = "Baby";

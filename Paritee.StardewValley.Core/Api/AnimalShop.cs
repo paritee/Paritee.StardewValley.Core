@@ -1,20 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using StardewValley.Menus;
-using System.Collections.Generic;
+﻿using StardewValley;
 using System.Linq;
 
 namespace Paritee.StardewValley.Core.Api
 {
     public class AnimalShop
     {
-        public static Object FormatAsAnimalAvailableForPurchase(Farm farm, string name, string displayName, int price, string[] buildings)
+        public static global::StardewValley.Object FormatAsAnimalAvailableForPurchase(Farm farm, string name, string displayName, int price, string[] buildings)
         {
             Api.AnimalShop.RequiredBuildingIsBuilt(farm, buildings, out string type);
 
             // Divide price by two because of the weird functionality in Object.salePrice()
-            Object obj = new Object(Constants.AnimalShop.PurchaseAnimalStockParentSheetIndex, Constants.AnimalShop.PurchaseAnimalStockQuantity, false, price / 2)
+            global::StardewValley.Object obj = new global::StardewValley.Object(Constants.AnimalShop.PurchaseAnimalStockParentSheetIndex, Constants.AnimalShop.PurchaseAnimalStockQuantity, false, price / 2)
             {
                 Type = type,
                 displayName = displayName

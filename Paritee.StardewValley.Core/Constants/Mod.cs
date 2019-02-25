@@ -2,6 +2,6 @@
 {
     public class Mod
     {
-        public static string Path { get { return Api.Mod.GetPath(); } }
+        public static string Path => Api.Mod.GetPath();
     }
 }

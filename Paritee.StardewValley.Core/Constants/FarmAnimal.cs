@@ -9,7 +9,7 @@
 
         // Produce
         public const int NoProduce = default(int);
-        public static string NonProducerTool { get { return default(int).ToString(); } }
+        public static string NonProducerTool => default(int).ToString();
 
         // Health, happiness and fullness
         public const int DefaultHealth = 3;
@@ -24,7 +24,7 @@
         public const string ShearedPrefix = "Sheared";
 
         // Paths
-        public static int MaxPathFindingPerTick { get { return global::StardewValley.FarmAnimal.MaxPathfindingPerTick; } }
+        public static int MaxPathFindingPerTick => global::StardewValley.FarmAnimal.MaxPathfindingPerTick;
 
         public enum DataValueIndex
         {

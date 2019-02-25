@@ -60,6 +60,7 @@
     <Compile Include="Api\Location.cs" />
     <Compile Include="Api\Menu.cs" />
     <Compile Include="Api\Mod.cs" />
+    <Compile Include="Api\Object.cs" />
     <Compile Include="Api\PurchaseAnimalsMenu.cs" />
     <Compile Include="Api\Season.cs" />
     <Compile Include="Api\Weather.cs" />

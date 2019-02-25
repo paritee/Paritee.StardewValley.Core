@@ -6,18 +6,18 @@ namespace Paritee.StardewValley.Core.Constants
 {
     public class VanillaFarmAnimalType : FarmAnimalType
     {
-        public static VanillaFarmAnimalType WhiteChicken { get { return new VanillaFarmAnimalType("White Chicken"); } }
-        public static VanillaFarmAnimalType BrownChicken { get { return new VanillaFarmAnimalType("Brown Chicken"); } }
-        public static VanillaFarmAnimalType BlueChicken { get { return new VanillaFarmAnimalType("Blue Chicken"); } }
-        public static VanillaFarmAnimalType VoidChicken { get { return new VanillaFarmAnimalType("Void Chicken"); } }
-        public static VanillaFarmAnimalType WhiteCow { get { return new VanillaFarmAnimalType("White Cow"); } }
-        public static VanillaFarmAnimalType BrownCow { get { return new VanillaFarmAnimalType("Brown Cow"); } }
-        public static VanillaFarmAnimalType Goat { get { return new VanillaFarmAnimalType("Goat"); } }
-        public static VanillaFarmAnimalType Duck { get { return new VanillaFarmAnimalType("Duck"); } }
-        public static VanillaFarmAnimalType Sheep { get { return new VanillaFarmAnimalType("Sheep"); } }
-        public static VanillaFarmAnimalType Rabbit { get { return new VanillaFarmAnimalType("Rabbit"); } }
-        public static VanillaFarmAnimalType Pig { get { return new VanillaFarmAnimalType("Pig"); } }
-        public static VanillaFarmAnimalType Dinosaur { get { return new VanillaFarmAnimalType("Dinosaur"); } }
+        public static VanillaFarmAnimalType WhiteChicken => new VanillaFarmAnimalType("White Chicken");
+        public static VanillaFarmAnimalType BrownChicken => new VanillaFarmAnimalType("Brown Chicken");
+        public static VanillaFarmAnimalType BlueChicken => new VanillaFarmAnimalType("Blue Chicken");
+        public static VanillaFarmAnimalType VoidChicken => new VanillaFarmAnimalType("Void Chicken");
+        public static VanillaFarmAnimalType WhiteCow => new VanillaFarmAnimalType("White Cow");
+        public static VanillaFarmAnimalType BrownCow => new VanillaFarmAnimalType("Brown Cow");
+        public static VanillaFarmAnimalType Goat => new VanillaFarmAnimalType("Goat");
+        public static VanillaFarmAnimalType Duck => new VanillaFarmAnimalType("Duck");
+        public static VanillaFarmAnimalType Sheep => new VanillaFarmAnimalType("Sheep");
+        public static VanillaFarmAnimalType Rabbit => new VanillaFarmAnimalType("Rabbit");
+        public static VanillaFarmAnimalType Pig => new VanillaFarmAnimalType("Pig");
+        public static VanillaFarmAnimalType Dinosaur => new VanillaFarmAnimalType("Dinosaur");
 
         private VanillaFarmAnimalType(string name) : base(name) { }
 

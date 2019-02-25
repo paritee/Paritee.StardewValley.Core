@@ -237,7 +237,7 @@ namespace Paritee.StardewValley.Core.Api
             // NOTE: This will NOT catch when tool is -1 which allows for animals 
             // that do not produce anything ever
             return Api.FarmAnimal.RequiresToolForHarvest(harvestType)
-                && (Api.FarmAnimal.IsDataValueNull(harvestTool));
+                && Api.FarmAnimal.IsDataValueNull(harvestTool);
         }
 
         public static bool CanBeNamed(global::StardewValley.FarmAnimal animal)
@@ -413,6 +413,11 @@ namespace Paritee.StardewValley.Core.Api
             return animal.currentProduce.Value;
         }
 
+        public static bool IsCurrentlyProducing(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.IsProduceAnItem(Api.FarmAnimal.GetCurrentProduce(animal));
+        }
+
         public static int GetDefaultProduce(global::StardewValley.FarmAnimal animal)
         {
             return animal.defaultProduceIndex.Value;
@@ -421,6 +426,11 @@ namespace Paritee.StardewValley.Core.Api
         public static int GetDeluxeProduce(global::StardewValley.FarmAnimal animal)
         {
             return animal.deluxeProduceIndex.Value;
+        }
+
+        public static int GetProduceQuality(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.produceQuality.Value;
         }
 
         public static bool HasProduceThatMatchesAll(global::StardewValley.FarmAnimal animal, int[] targets)
@@ -570,6 +580,11 @@ namespace Paritee.StardewValley.Core.Api
         public static string GetSound(global::StardewValley.FarmAnimal animal)
         {
             return animal.sound.Value;
+        }
+
+        public static void ReloadSpriteTexture(global::StardewValley.FarmAnimal animal)
+        {
+            animal.Sprite.LoadTexture(Api.FarmAnimal.BuildSpriteAssetName(animal));
         }
 
         public static string BuildSpriteAssetName(global::StardewValley.FarmAnimal animal)
