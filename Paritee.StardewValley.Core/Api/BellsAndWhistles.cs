@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using System;
 
 namespace Paritee.StardewValley.Core.Api
@@ -81,6 +83,11 @@ namespace Paritee.StardewValley.Core.Api
         public static void AddHudMessage(string type, int number, bool add, Color color, Item messageSubject = null)
         {
             Game1.addHUDMessage(new HUDMessage(type, number, add, color, messageSubject));
+        }
+
+        public static void DrawScroll(SpriteBatch spriteBatch, string str, int x, int y, string placeHolderWidthText = "", float alpha = 1f, int color = -1)
+        {
+            SpriteText.drawStringWithScrollBackground(spriteBatch, str, x, y, placeHolderWidthText, alpha, color);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Paritee.StardewValley.Core.Helpers
             return new System.Random(seed);
         }
 
-        public static double NextDouble(int seed = default(int))
+        public static double NextDouble()
         {
             return Helpers.Random.GetNumberGenerator().NextDouble();
         }

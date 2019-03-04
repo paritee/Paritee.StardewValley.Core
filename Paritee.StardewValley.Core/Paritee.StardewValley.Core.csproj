@@ -75,7 +75,6 @@
     <Compile Include="Constants\Environment.cs" />
     <Compile Include="Constants\VanillaFarmAnimalCategory.cs" />
     <Compile Include="Constants\VanillaFarmAnimalType.cs" />
-    <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Random.cs" />
     <Compile Include="Helpers\Reflection.cs" />
     <Compile Include="Models\FarmAnimalCategory.cs" />

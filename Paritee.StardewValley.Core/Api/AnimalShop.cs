@@ -1,16 +1,21 @@
 ﻿using StardewValley;
+using System;
 using System.Linq;
 
 namespace Paritee.StardewValley.Core.Api
 {
     public class AnimalShop
     {
-        public static global::StardewValley.Object FormatAsAnimalAvailableForPurchase(Farm farm, string name, string displayName, int price, string[] buildings)
+        public static global::StardewValley.Object FormatAsAnimalAvailableForPurchase(Farm farm, string name, string displayName, string[] types, string[] buildings)
         {
             Api.AnimalShop.RequiredBuildingIsBuilt(farm, buildings, out string type);
 
-            // Divide price by two because of the weird functionality in Object.salePrice()
-            global::StardewValley.Object obj = new global::StardewValley.Object(Constants.AnimalShop.PurchaseAnimalStockParentSheetIndex, Constants.AnimalShop.PurchaseAnimalStockQuantity, false, price / 2)
+            // Divide the first price by two because of the weird functionality 
+            // in Object.salePrice(). Need to use ceiling even though it may 
+            // exclude the lowest type if the lowest price is an odd number.
+            int price = (int)Math.Ceiling(Api.FarmAnimal.GetCheapestPrice(types.ToList()) / 2f);
+
+            global::StardewValley.Object obj = new global::StardewValley.Object(Constants.AnimalShop.PurchaseAnimalStockParentSheetIndex, Constants.AnimalShop.PurchaseAnimalStockQuantity, false, price)
             {
                 Type = type,
                 displayName = displayName

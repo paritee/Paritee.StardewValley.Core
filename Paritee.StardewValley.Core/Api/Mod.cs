@@ -14,7 +14,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static string SmapiSaveDataKey(string uniqueModId, string key)
         {
-            return $"smapi/mod-data/{uniqueModId}/{key}";
+            return $"smapi/mod-data/{(uniqueModId ?? "").ToLower()}/{key}";
         }
 
         public static T ReadSaveData<T>(string uniqueModId, string key) where T : new()
@@ -29,9 +29,15 @@ namespace Paritee.StardewValley.Core.Api
             Api.Game.WriteSaveData<T>(Api.Mod.SmapiSaveDataKey(uniqueModId, key), data);
         }
 
-        public static T ReadConfig<T>(string modPath, string fileName)
+        public static T ReadConfig<T>(string modPath, string fileName) where T: new()
         {
             string path = Path.Combine(modPath, fileName);
+
+            if (!File.Exists(path))
+            {
+                return new T();
+            }
+
             string json = File.ReadAllText(path);
 
             return JsonConvert.DeserializeObject<T>(json);

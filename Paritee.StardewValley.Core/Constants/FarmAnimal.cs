@@ -8,8 +8,8 @@
         public const int ItHarvestType = 2; // Only used by Hog in Vanilla
 
         // Produce
-        public const int NoProduce = default(int);
-        public static string NonProducerTool => default(int).ToString();
+        public const int NoProduce = -1;
+        public const string NonProducerTool = "-1";
 
         // Health, happiness and fullness
         public const int DefaultHealth = 3;
@@ -52,7 +52,9 @@
             HappinessDrain = 21,
             ToolUsedForHarvest = 22,
             MeatIndex = 23,
-            Price = 24
+            Price = 24,
+            DisplayType = 25,
+            DisplayBuilding = 26
         }
     }
 }

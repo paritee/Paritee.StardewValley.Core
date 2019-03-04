@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -95,6 +96,16 @@ namespace Paritee.StardewValley.Core.Api
         public static string[] ParseDataValue(string str)
         {
             return str.Split(Constants.Content.DataValueDelimiter);
+        }
+
+        public static int GetWidthOfString(string str, int widthContraint = 9999999)
+        {
+            return SpriteText.getWidthOfString(str);
+        }
+
+        public static string FormatMoneyString(int amount)
+        {
+            return "$" + Api.Content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", amount);
         }
     }
 }

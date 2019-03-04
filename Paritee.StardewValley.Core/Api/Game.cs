@@ -18,6 +18,11 @@ namespace Paritee.StardewValley.Core.Api
             return Api.Game.GetMultiplayer().getNewID();
         }
 
+        public static global::StardewValley.Farmer GetMasterPlayer()
+        {
+            return Game1.MasterPlayer;
+        }
+
         public static global::StardewValley.Farmer GetPlayer()
         {
             return Game1.player;

@@ -77,7 +77,10 @@ namespace Paritee.StardewValley.Core.Api
             animal.ageWhenMature.Value = Convert.ToByte(values[(int)Constants.FarmAnimal.DataValueIndex.AgeWhenMature]);
             animal.defaultProduceIndex.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.DefaultProduce]);
             animal.deluxeProduceIndex.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.DeluxeProduce]);
-            animal.sound.Value = Api.FarmAnimal.IsDataValueNull(values[(int)Constants.FarmAnimal.DataValueIndex.Sound]) ? null : values[(int)Constants.FarmAnimal.DataValueIndex.Sound];
+
+            string sound = values[(int)Constants.FarmAnimal.DataValueIndex.Sound];
+
+            animal.sound.Value = Api.FarmAnimal.IsDataValueNull(sound) ? null : sound;
 
             int x, y, width, height;
 
@@ -112,7 +115,10 @@ namespace Paritee.StardewValley.Core.Api
 
             animal.fullnessDrain.Value = Convert.ToByte(values[(int)Constants.FarmAnimal.DataValueIndex.FullnessDrain]);
             animal.happinessDrain.Value = Convert.ToByte(values[(int)Constants.FarmAnimal.DataValueIndex.HappinessDrain]);
-            animal.toolUsedForHarvest.Value = Api.FarmAnimal.IsDataValueNull(values[(int)Constants.FarmAnimal.DataValueIndex.ToolUsedForHarvest]) ? "" : values[(int)Constants.FarmAnimal.DataValueIndex.ToolUsedForHarvest];
+
+            string toolUsedForHarvest = values[(int)Constants.FarmAnimal.DataValueIndex.ToolUsedForHarvest];
+
+            animal.toolUsedForHarvest.Value = Api.FarmAnimal.IsDataValueNull(toolUsedForHarvest) ? "" : toolUsedForHarvest;
             animal.meatIndex.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.MeatIndex]);
             animal.price.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.Price]);
         }
@@ -296,12 +302,22 @@ namespace Paritee.StardewValley.Core.Api
             animal.controller = new PathFindController(animal, location, new PathFindController.isAtEnd(PathFindController.isAtEndPoint), 0, false, null, 200, new Point(animal.home.tileX.Value + animal.home.animalDoor.X, animal.home.tileY.Value + animal.home.animalDoor.Y));
         }
 
+        public static string GetDisplayHouse(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.displayHouse;
+        }
+
         public static bool IsCoopDweller(global::StardewValley.FarmAnimal animal)
         {
             string buildingType = Api.FarmAnimal.HasHome(animal)
                 ? animal.home.buildingType.Value
                 : animal.buildingTypeILiveIn.Value;
 
+            return Api.FarmAnimal.IsCoopDweller(buildingType);
+        }
+
+        public static bool IsCoopDweller(string buildingType)
+        {
             return buildingType == null ? false : buildingType.Contains(Constants.AnimalHouse.Coop);
         }
 
@@ -405,6 +421,34 @@ namespace Paritee.StardewValley.Core.Api
 
 
         /***
+         * Price
+         ***/
+
+        public static int GetPrice(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.price.Value;
+        }
+
+        public static int GetSellPrice(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.getSellPrice();
+        }
+
+        public static int GetCheapestPrice(List<string> types)
+        {
+            // Collect all of the prices from the animal types
+            List<int> prices = Api.Content.LoadData<string, string>(Constants.Content.DataFarmAnimalsContentPath)
+                .Where(kvp => types.Contains(kvp.Key))
+                .Select(kvp => Int32.Parse(Api.Content.ParseDataValue(kvp.Value)[(int)Constants.FarmAnimal.DataValueIndex.Price]))
+                .ToList();
+
+            // Sort the prices in ascending order
+            prices.Sort();
+
+            return prices.First();
+        }
+
+        /***
          * Produce
          ***/
 
@@ -415,7 +459,10 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsCurrentlyProducing(global::StardewValley.FarmAnimal animal)
         {
-            return Api.FarmAnimal.IsProduceAnItem(Api.FarmAnimal.GetCurrentProduce(animal));
+            int currentProduce = Api.FarmAnimal.GetCurrentProduce(animal);
+
+            // Don't count "Weeds" (index:0) as produce
+            return Api.FarmAnimal.IsProduceAnItem(currentProduce) && currentProduce > 0;
         }
 
         public static int GetDefaultProduce(global::StardewValley.FarmAnimal animal)
@@ -508,8 +555,8 @@ namespace Paritee.StardewValley.Core.Api
                 return true;
             }
 
-            // ... and the harvest type is "-1" will never produce
-            return Api.FarmAnimal.IsToolUsedForHarvest(animal, Constants.FarmAnimal.NonProducerTool);
+            // ... and the harvest type of "-1" will never produce
+            return !Api.FarmAnimal.IsToolUsedForHarvest(animal, Constants.FarmAnimal.NonProducerTool);
         }
 
         public static void SetCurrentProduce(global::StardewValley.FarmAnimal animal, int produceIndex)
@@ -589,27 +636,41 @@ namespace Paritee.StardewValley.Core.Api
 
         public static string BuildSpriteAssetName(global::StardewValley.FarmAnimal animal)
         {
+            bool isBaby = Api.FarmAnimal.IsBaby(animal);
+            bool isSheared = !isBaby && Api.FarmAnimal.IsSheared(animal);
+
+            if (!Api.FarmAnimal.TryBuildSpriteAssetName(Api.FarmAnimal.GetType(animal), isBaby, isSheared, out string assetName))
+            {
+                // Covers the BabyDuck scenario by using BabyWhite Chicken
+                bool isCoopDweller = Api.FarmAnimal.IsCoopDweller(animal);
+
+                assetName = Api.FarmAnimal.BuildSpriteAssetName(Api.FarmAnimal.GetDefaultType(isCoopDweller), isBaby, isSheared);
+            }
+
+            return assetName;
+        }
+
+        public static string BuildSpriteAssetName(string type, bool isBaby = false, bool isSheared = false)
+        {
             string prefix = "";
 
-            if (Api.FarmAnimal.IsBaby(animal))
+            if (isBaby)
             {
                 prefix = Constants.FarmAnimal.BabyPrefix;
             }
-            else if (Api.FarmAnimal.IsSheared(animal))
+            else if (isSheared)
             {
                 prefix = Constants.FarmAnimal.ShearedPrefix;
             }
 
-            string assetName = prefix + animal.type.Value;
+            return Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, prefix + type });
+        }
 
-            // Check if the asset exists (ex. vanilla fails on BabyDuck)
-            if (!Api.Content.Exists<Texture2D>(Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName })))
-            {
-                // Covers the BabyDuck scenario by using BabyWhite Chicken
-                assetName = Api.FarmAnimal.GetDefaultType(animal);
-            }
+        public static bool TryBuildSpriteAssetName(string type, bool isBaby, bool isSheared, out string assetName)
+        {
+            assetName = Api.FarmAnimal.BuildSpriteAssetName(type, isBaby, isSheared);
 
-            return Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, assetName });
+            return Api.Content.Exists<Texture2D>(assetName);
         }
 
         public static AnimatedSprite CreateSprite(global::StardewValley.FarmAnimal animal)
@@ -647,8 +708,9 @@ namespace Paritee.StardewValley.Core.Api
                     break;
             }
 
-            global::StardewValley.Farmer player = Api.Game.GetPlayer();
-            Delegate @delegate = Delegate.CreateDelegate(typeof(AnimatedSprite.endOfAnimationBehavior), player, Helpers.Reflection.GetMethod(animal, "findTruffle"));
+            Delegate @delegate = Delegate.CreateDelegate(typeof(AnimatedSprite.endOfAnimationBehavior), animal, Helpers.Reflection.GetMethod(animal, "findTruffle"));
+
+            AnimatedSprite.endOfAnimationBehavior endOfAnimationBehavior = (AnimatedSprite.endOfAnimationBehavior)@delegate;
 
             List<FarmerSprite.AnimationFrame> animation = new List<FarmerSprite.AnimationFrame>()
             {
@@ -657,7 +719,7 @@ namespace Paritee.StardewValley.Core.Api
                 new FarmerSprite.AnimationFrame(frame1, 250),
                 new FarmerSprite.AnimationFrame(frame2, 250),
                 new FarmerSprite.AnimationFrame(frame1, 250),
-                new FarmerSprite.AnimationFrame(frame2, 250, false, false, (AnimatedSprite.endOfAnimationBehavior)@delegate, false) // TODO: Validate this insanity.
+                new FarmerSprite.AnimationFrame(frame2, 250, false, false, endOfAnimationBehavior, false) // TODO: Validate this insanity.
             };
 
             animal.Sprite.setCurrentAnimation(animation);
@@ -731,9 +793,13 @@ namespace Paritee.StardewValley.Core.Api
                     for (int k = 0; k < animalHouse.animalsThatLiveHere.Count(); ++k)
                     {
                         long id = animalHouse.animalsThatLiveHere.ElementAt(k);
-                        global::StardewValley.FarmAnimal animal = animalHouse.animals[id];
 
-                        Api.FarmAnimal.Reload(animal, animal.home);
+                        if (animalHouse.animals.ContainsKey(id))
+                        {
+                            global::StardewValley.FarmAnimal animal = animalHouse.animals[id];
+
+                            Api.FarmAnimal.Reload(animal, animal.home);
+                        }
                     }
                 }
 
@@ -877,6 +943,16 @@ namespace Paritee.StardewValley.Core.Api
             }
 
             return Helpers.Random.NextDouble() >= Constants.FarmAnimal.BlueChickenChance;
+        }
+
+        public static List<string> SanitizeAffordableTypes(List<string> types, global::StardewValley.Farmer farmer)
+        {
+            // Filter out any types that the player cannot afford
+            return Api.Content.LoadData<string, string>(Constants.Content.DataFarmAnimalsContentPath)
+                .Where(kvp => types.Contains(kvp.Key) && Api.Farmer.CanAfford(farmer, Int32.Parse(Api.Content.ParseDataValue(kvp.Value)[(int)Constants.FarmAnimal.DataValueIndex.Price])))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+                .Keys
+                .ToList();
         }
 
         public static List<string> SanitizeBlueChickens(List<string> types, global::StardewValley.Farmer farmer)
