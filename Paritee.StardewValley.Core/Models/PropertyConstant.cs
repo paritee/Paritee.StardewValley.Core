@@ -6,7 +6,7 @@ namespace Paritee.StardewValley.Core.Models
 {
     public class PropertyConstant
     {
-        public string Name { get; set; }
+        private string Name { get; set; }
 
         protected PropertyConstant(string name)
         {

@@ -276,26 +276,26 @@ namespace Paritee.StardewValley.Core.Api
         {
             // "It" harvest type doesn't allow you to name the animal. This is 
             // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.ItHarvestType);
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.ButcherHarvestType);
         }
 
         public static bool LaysProduce(global::StardewValley.FarmAnimal animal)
         {
-            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.AutomaticHarvestType);
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.LayHarvestType);
         }
 
         public static bool RequiresToolForHarvest(global::StardewValley.FarmAnimal animal)
         {
             // "It" harvest type doesn't allow you to name the animal. This is 
             // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.RequiresToolHarvestType);
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.GrabHarvestType);
         }
 
         public static bool RequiresToolForHarvest(int harvestType)
         {
             // "It" harvest type doesn't allow you to name the animal. This is 
             // mostly unused and is only seen on the Hog
-            return Api.FarmAnimal.HasHarvestType(harvestType, Constants.FarmAnimal.RequiresToolHarvestType);
+            return Api.FarmAnimal.HasHarvestType(harvestType, Constants.FarmAnimal.GrabHarvestType);
         }
 
         public static string GetToolUsedForHarvest(global::StardewValley.FarmAnimal animal)
@@ -790,7 +790,7 @@ namespace Paritee.StardewValley.Core.Api
             }
             else if (isSheared)
             {
-                prefix = Constants.FarmAnimal.ShearedPrefix;
+                prefix = Constants.FarmAnimal.ReadyForHarvestPrefix;
             }
 
             return Api.Content.BuildPath(new string[] { Constants.Content.AnimalsContentDirectory, prefix + type });
@@ -885,7 +885,7 @@ namespace Paritee.StardewValley.Core.Api
                 return daysToLay;
             }
 
-            bool isSheep = Api.FarmAnimal.IsType(animal, Constants.VanillaAnimalType.Sheep);
+            bool isSheep = Api.FarmAnimal.IsType(animal, Constants.Animals.Livestock.Sheep);
             bool hasShepherdProfession = Api.Farmer.HasProfession(farmer, Constants.Farmer.Profession.Shepherd);
 
             daysToLay = (byte)Math.Min(Constants.FarmAnimal.MaxDaysToLay, Math.Max(Constants.FarmAnimal.MinDaysToLay, daysToLay + (isSheep && hasShepherdProfession ? Constants.FarmAnimal.ShepherdProfessionDaysToLayBonus : 0)));
@@ -999,7 +999,7 @@ namespace Paritee.StardewValley.Core.Api
             return animal.displayType;
         }
 
-        public static bool IsType(global::StardewValley.FarmAnimal animal, Constants.VanillaAnimalType type)
+        public static bool IsType(global::StardewValley.FarmAnimal animal, Constants.Animals.Livestock type)
         {
             return Api.FarmAnimal.IsType(animal, type.ToString());
         }
@@ -1033,12 +1033,12 @@ namespace Paritee.StardewValley.Core.Api
 
         public static string GetDefaultCoopDwellerType()
         {
-            return Constants.VanillaAnimalType.WhiteChicken.ToString();
+            return Constants.Animals.Livestock.WhiteChicken.ToString();
         }
 
         public static string GetDefaultBarnDwellerType()
         {
-            return Constants.VanillaAnimalType.WhiteCow.ToString();
+            return Constants.Animals.Livestock.WhiteCow.ToString();
         }
 
         public static List<string> GetTypesFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)
@@ -1120,7 +1120,7 @@ namespace Paritee.StardewValley.Core.Api
         public static List<string> SanitizeBlueChickens(List<string> types, global::StardewValley.Farmer farmer)
         {
             // Sanitize for blue chickens
-            string blueChicken = Constants.VanillaAnimalType.BlueChicken.ToString();
+            string blueChicken = Constants.Animals.Livestock.BlueChicken.ToString();
 
             // Check for blue chicken chance
             if (types.Contains(blueChicken) && !Api.AnimalShop.IsBlueChickenAvailableForPurchase(farmer))
@@ -1143,7 +1143,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsVanilla(string type)
         {
-            return Constants.VanillaAnimalType.Exists(type);
+            return Constants.Animals.Livestock.Exists(type);
         }
     }
 }

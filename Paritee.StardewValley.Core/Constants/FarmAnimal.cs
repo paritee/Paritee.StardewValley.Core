@@ -3,9 +3,9 @@
     public class FarmAnimal
     {
         // Harvest types
-        public const int AutomaticHarvestType = 0;
-        public const int RequiresToolHarvestType = 1;
-        public const int ItHarvestType = 2; // Only used by Hog in Vanilla
+        public const int LayHarvestType = 0;
+        public const int GrabHarvestType = 1;
+        public const int ButcherHarvestType = 2; // Only used by Hog in Vanilla
 
         // Produce
         public const int NoProduce = Constants.Object.NoIndex;
@@ -30,7 +30,7 @@
 
         // Sprites
         public const string BabyPrefix = "Baby";
-        public const string ShearedPrefix = "Sheared";
+        public const string ReadyForHarvestPrefix = "Sheared";
 
         // Paths
         public static int MaxPathFindingPerTick => global::StardewValley.FarmAnimal.MaxPathfindingPerTick;

@@ -66,6 +66,7 @@
     <Compile Include="Api\Weather.cs" />
     <Compile Include="Constants\AnimalHouse.cs" />
     <Compile Include="Constants\AnimalShop.cs" />
+    <Compile Include="Constants\Animals\Stable.cs" />
     <Compile Include="Constants\Blueprint.cs" />
     <Compile Include="Constants\Content.cs" />
     <Compile Include="Constants\Currency.cs" />
@@ -75,12 +76,15 @@
     <Compile Include="Constants\Mod.cs" />
     <Compile Include="Constants\Environment.cs" />
     <Compile Include="Constants\Object.cs" />
-    <Compile Include="Constants\VanillaFarmAnimalCategory.cs" />
-    <Compile Include="Constants\VanillaAnimalType.cs" />
+    <Compile Include="Constants\Animals\LivestockCategory.cs" />
+    <Compile Include="Constants\Animals\Livestock.cs" />
+    <Compile Include="Constants\Animals\Pet.cs" />
     <Compile Include="Helpers\Random.cs" />
     <Compile Include="Helpers\Reflection.cs" />
-    <Compile Include="Models\FarmAnimalCategory.cs" />
-    <Compile Include="Models\FarmAnimalType.cs" />
+    <Compile Include="Models\Animal.cs" />
+    <Compile Include="Models\LivestockAnimalShop.cs" />
+    <Compile Include="Models\LivestockCategory.cs" />
+    <Compile Include="Models\Livestock.cs" />
     <Compile Include="Models\PropertyConstant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
