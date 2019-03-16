@@ -12,8 +12,8 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.WhiteCow.ToString(),
-                    VanillaFarmAnimalType.BrownCow.ToString()
+                    VanillaAnimalType.WhiteCow.ToString(),
+                    VanillaAnimalType.BrownCow.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -36,15 +36,15 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.WhiteChicken.ToString(),
-                    VanillaFarmAnimalType.BrownChicken.ToString(),
-                    VanillaFarmAnimalType.BlueChicken.ToString(),
-                    VanillaFarmAnimalType.VoidChicken.ToString()
+                    VanillaAnimalType.WhiteChicken.ToString(),
+                    VanillaAnimalType.BrownChicken.ToString(),
+                    VanillaAnimalType.BlueChicken.ToString(),
+                    VanillaAnimalType.VoidChicken.ToString()
                 };
 
                 string[] excludeFromShop = new string[]
                 {
-                    VanillaFarmAnimalType.VoidChicken.ToString()
+                    VanillaAnimalType.VoidChicken.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -67,7 +67,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Sheep.ToString()
+                    VanillaAnimalType.Sheep.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -88,7 +88,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Goat.ToString()
+                    VanillaAnimalType.Goat.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -110,7 +110,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Pig.ToString()
+                    VanillaAnimalType.Pig.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -131,7 +131,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Duck.ToString()
+                    VanillaAnimalType.Duck.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -143,7 +143,10 @@ namespace Paritee.StardewValley.Core.Constants
                 string displayName = VanillaFarmAnimalCategory.LoadDisplayName("5937");
                 string description = VanillaFarmAnimalCategory.LoadDescription("11337");
 
-                return new VanillaFarmAnimalCategory("Duck", 3, displayName, description, 4000, types, buildings);
+                string[] exclude = new string[] { };
+                double deluxeProduceLuck = 0.01;
+
+                return new VanillaFarmAnimalCategory("Duck", 3, displayName, description, 4000, types, buildings, exclude, deluxeProduceLuck);
             }
         }
 
@@ -153,7 +156,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Rabbit.ToString()
+                    VanillaAnimalType.Rabbit.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -164,7 +167,10 @@ namespace Paritee.StardewValley.Core.Constants
                 string displayName = VanillaFarmAnimalCategory.LoadDisplayName("5945");
                 string description = VanillaFarmAnimalCategory.LoadDescription("11340");
 
-                return new VanillaFarmAnimalCategory("Rabbit", 5, displayName, description, 8000, types, buildings);
+                string[] exclude = new string[] { };
+                double deluxeProduceLuck = 0.02;
+
+                return new VanillaFarmAnimalCategory("Rabbit", 5, displayName, description, 8000, types, buildings, exclude, deluxeProduceLuck);
             }
         }
 
@@ -174,7 +180,7 @@ namespace Paritee.StardewValley.Core.Constants
             {
                 string[] types = new string[]
                 {
-                    VanillaFarmAnimalType.Dinosaur.ToString()
+                    VanillaAnimalType.Dinosaur.ToString()
                 };
 
                 string[] buildings = new string[]
@@ -190,8 +196,8 @@ namespace Paritee.StardewValley.Core.Constants
         private VanillaFarmAnimalCategory(string name, int order, string[] types, string[] buildings) 
             : base(name, order, types, buildings) { }
 
-        private VanillaFarmAnimalCategory(string name, int order, string displayName, string description, int price, string[] types, string[] buildings, string[] excludeFromShop = null) 
-            : base(name, order, displayName, description, price, types, buildings, excludeFromShop) { }
+        private VanillaFarmAnimalCategory(string name, int order, string displayName, string description, int price, string[] types, string[] buildings, string[] excludeFromShop = null, double deluxeProduceLuck = default(double)) 
+            : base(name, order, displayName, description, price, types, buildings, excludeFromShop, deluxeProduceLuck) { }
 
 
         public static bool Exists(string str)

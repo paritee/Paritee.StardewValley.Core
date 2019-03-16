@@ -71,10 +71,12 @@
     <Compile Include="Constants\Currency.cs" />
     <Compile Include="Constants\Event.cs" />
     <Compile Include="Constants\FarmAnimal.cs" />
+    <Compile Include="Constants\Farmer.cs" />
     <Compile Include="Constants\Mod.cs" />
     <Compile Include="Constants\Environment.cs" />
+    <Compile Include="Constants\Object.cs" />
     <Compile Include="Constants\VanillaFarmAnimalCategory.cs" />
-    <Compile Include="Constants\VanillaFarmAnimalType.cs" />
+    <Compile Include="Constants\VanillaAnimalType.cs" />
     <Compile Include="Helpers\Random.cs" />
     <Compile Include="Helpers\Reflection.cs" />
     <Compile Include="Models\FarmAnimalCategory.cs" />

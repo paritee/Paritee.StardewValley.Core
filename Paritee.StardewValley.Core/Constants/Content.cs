@@ -9,5 +9,6 @@
 
         public static string DataFarmAnimalsContentPath => Api.Content.BuildPath(new string[] { "Data", "FarmAnimals" });
         public static string DataBlueprintsContentPath => Api.Content.BuildPath(new string[] { "Data", "Blueprints" });
+        public static string DataObjectInformationContentPath => Api.Content.BuildPath(new string[] { "Data", "ObjectInformation" });
     }
 }

@@ -88,5 +88,9 @@ namespace Paritee.StardewValley.Core.Api
             return Api.FarmAnimal.CreateFarmAnimal(type, Api.Farmer.GetUniqueId(farmer), name, home, myId);
         }
 
+        public static bool HasProfession(global::StardewValley.Farmer farmer, Constants.Farmer.Profession profession)
+        {
+            return farmer.professions.Contains((int)profession);
+        }
     }
 }

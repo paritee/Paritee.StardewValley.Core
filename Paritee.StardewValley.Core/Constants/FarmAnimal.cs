@@ -8,16 +8,25 @@
         public const int ItHarvestType = 2; // Only used by Hog in Vanilla
 
         // Produce
-        public const int NoProduce = -1;
-        public const string NonProducerTool = "-1";
+        public const int NoProduce = Constants.Object.NoIndex;
+        public static string NonProducerTool => Constants.Object.NoIndex.ToString();
+        public const int ShepherdProfessionDaysToLayBonus = -1;
+        public const byte MinDaysToLay = byte.MinValue;
+        public const byte MaxDaysToLay = byte.MaxValue;
+        public const byte MinDaysSinceLastLay = byte.MinValue;
+        public const byte MaxDaysSinceLastLay = byte.MaxValue;
 
         // Health, happiness and fullness
         public const int DefaultHealth = 3;
+        public const byte MinHappiness = byte.MinValue;
         public const byte MaxHappiness = byte.MaxValue;
+        public const byte MinFullness = byte.MinValue;
         public const byte MaxFullness = byte.MaxValue;
 
         // Events
         public const double BlueChickenChance = 0.25;
+        public const int MinPauseTimer = 0;
+        public const int MinHitGlowTimer = 0;
 
         // Sprites
         public const string BabyPrefix = "Baby";
@@ -25,6 +34,17 @@
 
         // Paths
         public static int MaxPathFindingPerTick => global::StardewValley.FarmAnimal.MaxPathfindingPerTick;
+
+        public enum MoodMessage
+        {
+            NewHome = 0,
+            Happy = 1,
+            Fine = 2,
+            Sad = 3,
+            Hungry = 4,
+            DisturbedByDog = 5,
+            LeftOutsideAtNight = 6,
+        }
 
         public enum DataValueIndex
         {
@@ -54,7 +74,7 @@
             MeatIndex = 23,
             Price = 24,
             DisplayType = 25,
-            DisplayBuilding = 26
+            DisplayBuilding = 26,
         }
     }
 }

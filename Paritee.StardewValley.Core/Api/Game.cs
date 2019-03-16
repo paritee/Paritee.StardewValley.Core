@@ -33,6 +33,11 @@ namespace Paritee.StardewValley.Core.Api
             return Game1.getFarm();
         }
 
+        public static global::StardewValley.Farmer GetFarmer(long farmerId)
+        {
+            return Game1.getFarmer(farmerId);
+        }
+
         public static double GetDailyLuck()
         {
             return Game1.dailyLuck;
@@ -100,6 +105,16 @@ namespace Paritee.StardewValley.Core.Api
         public static int GetTimeOfDay(bool afterFade = false)
         {
             return afterFade ? Game1.timeOfDayAfterFade : Game1.timeOfDay;
+        }
+
+        public static bool IsEarlierThan(int time)
+        {
+            return Api.Game.GetTimeOfDay() < time;
+        }
+
+        public static bool IsLaterThan(int time)
+        {
+            return Api.Game.GetTimeOfDay() > time;
         }
     }
 }

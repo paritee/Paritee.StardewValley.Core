@@ -47,5 +47,32 @@ namespace Paritee.StardewValley.Core.Api
         {
             return obj.bigCraftable.Value;
         }
+
+        public static bool TryParse(string name, out int index)
+        {
+            index = Constants.Object.NoIndex;
+
+            Dictionary<int, string> data = Api.Content.LoadData<int, string>(Constants.Content.DataObjectInformationContentPath);
+
+            foreach (KeyValuePair<int, string> entry in data)
+            {
+                string[] values = Api.Content.ParseDataValue(entry.Value);
+
+                if (values[(int)Constants.Object.DataValueIndex.Name] == name)
+                {
+                    index = entry.Key;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool ObjectExists(int index)
+        {
+            return Api.Content.LoadData<int, string>(Constants.Content.DataObjectInformationContentPath)
+                .ContainsKey(index);
+        }
     }
 }

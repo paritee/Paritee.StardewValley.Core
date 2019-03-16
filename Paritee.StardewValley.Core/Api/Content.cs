@@ -65,10 +65,10 @@ namespace Paritee.StardewValley.Core.Api
 
         public static U GetDataValue<T, U>(string path, T id, int index)
         {
-            Dictionary<T, U> data = Api.Content.LoadData<T, U>(Constants.Content.DataBlueprintsContentPath);
+            Dictionary<T, U> data = Api.Content.LoadData<T, U>(path);
             KeyValuePair<T, U> entry = Api.Content.GetDataEntry<T, U>(data, id);
 
-            if (entry.Key.Equals(default(T)))
+            if (entry.Key == null || entry.Key.Equals(default(T)))
             {
                 return default(U);
             }

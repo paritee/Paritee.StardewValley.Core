@@ -68,7 +68,11 @@ namespace Paritee.StardewValley.Core.Api
                     throw new KeyNotFoundException($"Could not find {defaultType} to overwrite custom farm animal for saving. This is a fatal error. Please make sure you have {defaultType} in the game.");
                 }
             }
-
+            
+            // Save for overwriting after
+            bool isCurrentlyProducingAnItem = Api.FarmAnimal.IsProduceAnItem(Api.FarmAnimal.GetCurrentProduce(animal));
+            bool isCurrentlyProducingDeluxe = Api.FarmAnimal.IsCurrentlyProducingDeluxe(animal);
+            
             string[] values = Api.Content.ParseDataValue(contentDataEntry.Value);
 
             // Reset the instance's values based on the new type
@@ -121,6 +125,13 @@ namespace Paritee.StardewValley.Core.Api
             animal.toolUsedForHarvest.Value = Api.FarmAnimal.IsDataValueNull(toolUsedForHarvest) ? "" : toolUsedForHarvest;
             animal.meatIndex.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.MeatIndex]);
             animal.price.Value = Convert.ToInt32(values[(int)Constants.FarmAnimal.DataValueIndex.Price]);
+
+            // Reset the current produce
+            int produceIndex = isCurrentlyProducingAnItem
+                ? isCurrentlyProducingDeluxe ? Api.FarmAnimal.GetDeluxeProduce(animal) : Api.FarmAnimal.GetDefaultProduce(animal)
+                : Constants.FarmAnimal.NoProduce;
+
+            Api.FarmAnimal.SetCurrentProduce(animal, produceIndex);
         }
 
         private static bool IsDataValueNull(string value)
@@ -145,7 +156,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static void SetFriendship(global::StardewValley.FarmAnimal animal, int newAmount)
         {
-            animal.friendshipTowardFarmer.Value = newAmount;
+            animal.friendshipTowardFarmer.Value = Math.Max(0, newAmount);
         }
 
         public static int GetFriendship(global::StardewValley.FarmAnimal animal)
@@ -165,7 +176,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static void SetFullness(global::StardewValley.FarmAnimal animal, byte fullness)
         {
-            animal.fullness.Value = fullness;
+            animal.fullness.Value = Math.Max(Constants.FarmAnimal.MinFullness, Math.Min(Constants.FarmAnimal.MaxFullness, fullness));
         }
 
         public static void SetFindGrassPathController(global::StardewValley.FarmAnimal animal, GameLocation location)
@@ -205,7 +216,22 @@ namespace Paritee.StardewValley.Core.Api
 
         public static void SetHappiness(global::StardewValley.FarmAnimal animal, byte happiness)
         {
-            animal.happiness.Value = happiness;
+            animal.happiness.Value = Math.Max(Constants.FarmAnimal.MinHappiness, Math.Min(Constants.FarmAnimal.MaxHappiness, happiness));
+        }
+
+        public static byte GetHappinessDrain(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.happinessDrain.Value;
+        }
+
+        public static void SetMoodMessage(global::StardewValley.FarmAnimal animal, Constants.FarmAnimal.MoodMessage moodMessage)
+        {
+            Helpers.Reflection.GetField(animal, "moodMessage").SetValue(animal, (int)moodMessage);
+        }
+
+        public static bool WasPet(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.wasPet.Value;
         }
 
 
@@ -253,6 +279,11 @@ namespace Paritee.StardewValley.Core.Api
             return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.ItHarvestType);
         }
 
+        public static bool LaysProduce(global::StardewValley.FarmAnimal animal)
+        {
+            return Api.FarmAnimal.HasHarvestType(animal, Constants.FarmAnimal.AutomaticHarvestType);
+        }
+
         public static bool RequiresToolForHarvest(global::StardewValley.FarmAnimal animal)
         {
             // "It" harvest type doesn't allow you to name the animal. This is 
@@ -287,9 +318,24 @@ namespace Paritee.StardewValley.Core.Api
          * Home
          ***/
 
+        public static global::StardewValley.Buildings.Building GetHome(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.home;
+        }
+
         public static bool HasHome(global::StardewValley.FarmAnimal animal)
         {
-            return animal.home != null;
+            return Api.FarmAnimal.GetHome(animal) != null;
+        }
+
+        public static bool IsInHome(global::StardewValley.FarmAnimal animal)
+        {
+            if (!Api.FarmAnimal.HasHome(animal))
+            {
+                return false;
+            }
+
+            return Api.AnimalHouse.GetIndoors(Api.FarmAnimal.GetHome(animal)).animals.ContainsKey(Api.FarmAnimal.GetUniqueId(animal));
         }
 
         public static void SetFindHomeDoorPathController(global::StardewValley.FarmAnimal animal, GameLocation location)
@@ -532,6 +578,13 @@ namespace Paritee.StardewValley.Core.Api
                 || IsProduceAnItem(deluxeProduceIndex);
         }
 
+        public static bool IsCurrentlyProducingDeluxe(global::StardewValley.FarmAnimal animal)
+        {
+            int currentProduce = Api.FarmAnimal.GetCurrentProduce(animal);
+
+            return currentProduce == Api.FarmAnimal.GetDeluxeProduce(animal);
+        }
+
         public static bool IsDefaultProduceAnItem(global::StardewValley.FarmAnimal animal)
         {
             return Api.FarmAnimal.IsProduceAnItem(animal.defaultProduceIndex.Value);
@@ -544,7 +597,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsProduceAnItem(int produceIndex)
         {
-            return !(produceIndex == Constants.FarmAnimal.NoProduce);
+            return produceIndex != Constants.FarmAnimal.NoProduce;
         }
 
         public static bool IsAProducer(global::StardewValley.FarmAnimal animal)
@@ -564,27 +617,77 @@ namespace Paritee.StardewValley.Core.Api
             animal.currentProduce.Value = produceIndex;
         }
 
-        public static int RollProduce(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer)
+        public static void SetProduceQuality(global::StardewValley.FarmAnimal animal, Constants.Object.Quality quality)
         {
-            return Api.FarmAnimal.RollDeluxeProduceChance(animal, Api.Farmer.GetDailyLuck(farmer))
+            animal.produceQuality.Value = (int)quality;
+        }
+
+        public static Constants.Object.Quality RollProduceQuality(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer, int seed)
+        {
+            int friendship = Api.FarmAnimal.GetFriendship(animal);
+            byte happiness = Api.FarmAnimal.GetHappiness(animal);
+
+            double num2 = friendship / 1000.0 - (1.0 - happiness / 225.0);
+
+            bool isCoopDweller = Api.FarmAnimal.IsCoopDweller(animal);
+            bool hasShepherdProfession = Api.Farmer.HasProfession(farmer, Constants.Farmer.Profession.Shepherd);
+            bool hasButcherProfession = Api.Farmer.HasProfession(farmer, Constants.Farmer.Profession.Butcher);
+
+            if (!isCoopDweller && hasShepherdProfession || isCoopDweller && hasButcherProfession)
+            {
+                num2 += 0.33;
+            }
+
+            Random random = new Random(seed);
+
+            if (num2 >= 0.95 && random.NextDouble() < num2 / 2.0)
+            {
+                return Constants.Object.Quality.Best;
+            }
+            else if (random.NextDouble() < num2 / 2.0)
+            {
+                return Constants.Object.Quality.High;
+            }
+            else if (random.NextDouble() < num2)
+            {
+                return Constants.Object.Quality.Medium;
+            }
+
+            return Constants.Object.Quality.Low;
+        }
+
+        public static int RollProduce(global::StardewValley.FarmAnimal animal, int seed, global::StardewValley.Farmer farmer = null, double deluxeProduceLuck = default(double))
+        {
+            double luck = farmer == null
+                ? default(double)
+                : Api.Farmer.GetDailyLuck(farmer) * deluxeProduceLuck;
+
+            return Api.FarmAnimal.RollDeluxeProduceChance(animal, luck, seed)
                 ? Api.FarmAnimal.GetDeluxeProduce(animal)
                 : Api.FarmAnimal.GetDefaultProduce(animal);
         }
 
-        public static bool RollDeluxeProduceChance(global::StardewValley.FarmAnimal animal, double luck)
+        public static bool RollDeluxeProduceChance(global::StardewValley.FarmAnimal animal, double luck, int seed)
         {
             if (Api.FarmAnimal.IsBaby(animal))
             {
                 return false;
             }
 
-            if (Api.FarmAnimal.IsProduceAnItem(animal.deluxeProduceIndex.Value))
+            if (!Api.FarmAnimal.IsProduceAnItem(Api.FarmAnimal.GetDeluxeProduce(animal)))
+            {
+                return false;
+            }
+
+            Random random = new Random(seed);
+            byte happiness = Api.FarmAnimal.GetHappiness(animal);
+
+            if (random.NextDouble() >= happiness / 150.0)
             {
                 return false;
             }
 
             double offset = 0.0d;
-            byte happiness = Api.FarmAnimal.GetHappiness(animal);
             int friendship = Api.FarmAnimal.GetFriendship(animal);
 
             if (happiness > 200)
@@ -596,28 +699,55 @@ namespace Paritee.StardewValley.Core.Api
                 offset = happiness - 100;
             }
 
-            if (Api.FarmAnimal.IsType(animal, Constants.VanillaFarmAnimalType.Duck))
+            if (luck != 0.0D)
             {
-                return Helpers.Random.NextDouble() < (friendship + offset) / 5000.0 + luck * 0.01;
+                return Helpers.Random.NextDouble() < (friendship + offset) / 5000.0 + luck;
             }
-
-            if (Api.FarmAnimal.IsType(animal, Constants.VanillaFarmAnimalType.Rabbit))
+            else
             {
-                return Helpers.Random.NextDouble() < (friendship + offset) / 5000.0 + luck * 0.02;
-            }
+                if (friendship < 200)
+                {
+                    return false;
+                }
 
-            if (friendship < 200)
-            {
-                return false;
+                return Helpers.Random.NextDouble() < (friendship + offset) / 1200.0;
             }
-
-            return Helpers.Random.NextDouble() < (friendship + offset) / 1200.0;
         }
 
 
         /***
          * Sounds and sprites
          ***/
+
+        public static void SetPauseTimer(global::StardewValley.FarmAnimal animal, int timer)
+        {
+            animal.pauseTimer = Math.Max(Constants.FarmAnimal.MinPauseTimer, timer);
+        }
+
+        public static int GetPauseTimer(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.pauseTimer;
+        }
+
+        public static void SetHitGlowTimer(global::StardewValley.FarmAnimal animal, int timer)
+        {
+            animal.hitGlowTimer = Math.Max(Constants.FarmAnimal.MinHitGlowTimer, timer);
+        }
+
+        public static int GetHitGlowTimer(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.hitGlowTimer;
+        }
+
+        public static bool HasPathController(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.controller != null;
+        }
+
+        public static void ResetPathController(global::StardewValley.FarmAnimal animal)
+        {
+            animal.controller = null;
+        }
 
         public static bool MakesSound(global::StardewValley.FarmAnimal animal)
         {
@@ -719,7 +849,7 @@ namespace Paritee.StardewValley.Core.Api
                 new FarmerSprite.AnimationFrame(frame1, 250),
                 new FarmerSprite.AnimationFrame(frame2, 250),
                 new FarmerSprite.AnimationFrame(frame1, 250),
-                new FarmerSprite.AnimationFrame(frame2, 250, false, false, endOfAnimationBehavior, false) // TODO: Validate this insanity.
+                new FarmerSprite.AnimationFrame(frame2, 250, false, false, endOfAnimationBehavior, false)
             };
 
             animal.Sprite.setCurrentAnimation(animation);
@@ -745,7 +875,39 @@ namespace Paritee.StardewValley.Core.Api
         {
             return animal.GetBoundingBox();
         }
-        
+
+        public static byte GetDaysToLay(global::StardewValley.FarmAnimal animal, global::StardewValley.Farmer farmer = null)
+        {
+            byte daysToLay = animal.daysToLay.Value;
+
+            if (farmer == null)
+            {
+                return daysToLay;
+            }
+
+            bool isSheep = Api.FarmAnimal.IsType(animal, Constants.VanillaAnimalType.Sheep);
+            bool hasShepherdProfession = Api.Farmer.HasProfession(farmer, Constants.Farmer.Profession.Shepherd);
+
+            daysToLay = (byte)Math.Min(Constants.FarmAnimal.MaxDaysToLay, Math.Max(Constants.FarmAnimal.MinDaysToLay, daysToLay + (isSheep && hasShepherdProfession ? Constants.FarmAnimal.ShepherdProfessionDaysToLayBonus : 0)));
+
+            return daysToLay;
+        }
+
+        public static byte GetDaysSinceLastLay(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.daysSinceLastLay.Value;
+        }
+
+        public static void SetDaysSinceLastLay(global::StardewValley.FarmAnimal animal, byte days)
+        {
+            animal.daysSinceLastLay.Value = Math.Max(Constants.FarmAnimal.MinDaysSinceLastLay, Math.Min(Constants.FarmAnimal.MaxDaysSinceLastLay, days));
+        }
+
+        public static int GetMeatIndex(global::StardewValley.FarmAnimal animal)
+        {
+            return animal.meatIndex.Value;
+        }
+
         /***
          * States
          ***/
@@ -837,7 +999,7 @@ namespace Paritee.StardewValley.Core.Api
             return animal.displayType;
         }
 
-        public static bool IsType(global::StardewValley.FarmAnimal animal, Constants.VanillaFarmAnimalType type)
+        public static bool IsType(global::StardewValley.FarmAnimal animal, Constants.VanillaAnimalType type)
         {
             return Api.FarmAnimal.IsType(animal, type.ToString());
         }
@@ -871,12 +1033,12 @@ namespace Paritee.StardewValley.Core.Api
 
         public static string GetDefaultCoopDwellerType()
         {
-            return Constants.VanillaFarmAnimalType.WhiteChicken.ToString();
+            return Constants.VanillaAnimalType.WhiteChicken.ToString();
         }
 
         public static string GetDefaultBarnDwellerType()
         {
-            return Constants.VanillaFarmAnimalType.WhiteCow.ToString();
+            return Constants.VanillaAnimalType.WhiteCow.ToString();
         }
 
         public static List<string> GetTypesFromProduce(int[] produceIndexes, Dictionary<string, List<string>> restrictions)
@@ -958,7 +1120,7 @@ namespace Paritee.StardewValley.Core.Api
         public static List<string> SanitizeBlueChickens(List<string> types, global::StardewValley.Farmer farmer)
         {
             // Sanitize for blue chickens
-            string blueChicken = Constants.VanillaFarmAnimalType.BlueChicken.ToString();
+            string blueChicken = Constants.VanillaAnimalType.BlueChicken.ToString();
 
             // Check for blue chicken chance
             if (types.Contains(blueChicken) && !Api.AnimalShop.IsBlueChickenAvailableForPurchase(farmer))
@@ -981,7 +1143,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool IsVanilla(string type)
         {
-            return Constants.VanillaFarmAnimalType.Exists(type);
+            return Constants.VanillaAnimalType.Exists(type);
         }
     }
 }

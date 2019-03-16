@@ -180,5 +180,10 @@ namespace Paritee.StardewValley.Core.Api
                 }
             }
         }
+
+        public static bool AreAnimalDoorsOpen(global::StardewValley.Buildings.Building building)
+        {
+            return building.animalDoorOpen.Value;
+        }
     }
 }
