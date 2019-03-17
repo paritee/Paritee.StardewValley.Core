@@ -4,18 +4,23 @@ using StardewValley.Menus;
 using System.Reflection;
 using xTile.Dimensions;
 
-namespace Paritee.StardewValley.Core.Api
+namespace Paritee.StardewValley.Core.Utilities
 {
     public class Game
     {
         public static Multiplayer GetMultiplayer()
         {
-            return Helpers.Reflection.GetFieldValue<Multiplayer>(typeof(Game1), "multiplayer", BindingFlags.Static | BindingFlags.NonPublic);
+            return Utilities.Reflection.GetFieldValue<Multiplayer>(typeof(Game1), "multiplayer", BindingFlags.Static | BindingFlags.NonPublic);
         }
 
         public static long GetNewId()
         {
-            return Api.Game.GetMultiplayer().getNewID();
+            return Utilities.Game.GetMultiplayer().getNewID();
+        }
+
+        public static global::StardewValley.Farmer GetMasterPlayer()
+        {
+            return Game1.MasterPlayer;
         }
 
         public static global::StardewValley.Farmer GetPlayer()
@@ -28,9 +33,24 @@ namespace Paritee.StardewValley.Core.Api
             return Game1.getFarm();
         }
 
+        public static global::StardewValley.Farmer GetFarmer(long farmerId)
+        {
+            return Game1.getFarmer(farmerId);
+        }
+
+        public static double GetDailyLuck()
+        {
+            return Game1.dailyLuck;
+        }
+
         public static GameLocation GetCurrentLocation()
         {
             return Game1.currentLocation;
+        }
+
+        public static bool IsCurrentLocation(GameLocation location)
+        {
+            return Locations.Location.IsLocation(Utilities.Game.GetCurrentLocation(), location);
         }
 
         public static bool IsSaveLoaded()
@@ -40,7 +60,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static bool ActiveMenuExists()
         {
-            return Api.Game.GetActiveMenu() == null;
+            return Utilities.Game.GetActiveMenu() == null;
         }
 
         public static IClickableMenu GetActiveMenu()
@@ -75,6 +95,26 @@ namespace Paritee.StardewValley.Core.Api
             {
                 Game1.CustomData.Remove(key);
             }
+        }
+
+        public static int GetDaysPlayed()
+        {
+            return (int)Game1.stats.DaysPlayed;
+        }
+
+        public static int GetTimeOfDay(bool afterFade = false)
+        {
+            return afterFade ? Game1.timeOfDayAfterFade : Game1.timeOfDay;
+        }
+
+        public static bool IsEarlierThan(int time)
+        {
+            return Utilities.Game.GetTimeOfDay() < time;
+        }
+
+        public static bool IsLaterThan(int time)
+        {
+            return Utilities.Game.GetTimeOfDay() > time;
         }
     }
 }

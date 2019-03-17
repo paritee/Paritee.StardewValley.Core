@@ -1,13 +1,23 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Paritee.StardewValley.Core.Api
+namespace Paritee.StardewValley.Core.Utilities
 {
     public class Content
     {
+        public const string AnimalsContentDirectory = "Animals";
+        public const char DataValueDelimiter = '/';
+        public const string None = "none";
+        public const int StartingFrame = 0;
+
+        public static string DataFarmAnimalsContentPath => Utilities.Content.BuildPath(new string[] { "Data", "FarmAnimals" });
+        public static string DataBlueprintsContentPath => Utilities.Content.BuildPath(new string[] { "Data", "Blueprints" });
+        public static string DataObjectInformationContentPath => Utilities.Content.BuildPath(new string[] { "Data", "ObjectInformation" });
+
         public static GraphicsDevice GetGraphicsDevice()
         {
             return Game1.game1.GraphicsDevice;
@@ -17,7 +27,7 @@ namespace Paritee.StardewValley.Core.Api
         {
             try
             {
-                Api.Content.Load<T>(name);
+                Utilities.Content.Load<T>(name);
 
                 return true;
             }
@@ -59,27 +69,32 @@ namespace Paritee.StardewValley.Core.Api
 
         public static KeyValuePair<T, U> GetDataEntry<T, U>(Dictionary<T, U> data, T id)
         {
-            return data.First(kvp => kvp.Key.Equals(id));
+            return data.FirstOrDefault(kvp => kvp.Key.Equals(id));
         }
 
         public static U GetDataValue<T, U>(string path, T id, int index)
         {
-            Dictionary<T, U> data = Api.Content.LoadData<T, U>(Constants.Content.DataBlueprintsContentPath);
-            KeyValuePair<T, U> entry = Api.Content.GetDataEntry<T, U>(data, id);
+            Dictionary<T, U> data = Utilities.Content.LoadData<T, U>(path);
+            KeyValuePair<T, U> entry = Utilities.Content.GetDataEntry<T, U>(data, id);
 
-            return (U)System.Convert.ChangeType(Api.Content.ParseDataValue(entry.Value.ToString())[index], typeof(U));
+            if (entry.Key == null || entry.Key.Equals(default(T)))
+            {
+                return default(U);
+            }
+
+            return (U)System.Convert.ChangeType(Utilities.Content.ParseDataValue(entry.Value.ToString())[index], typeof(U));
         }
 
         public static KeyValuePair<T, U> LoadDataEntry<T, U>(string path, T id)
         {
-            Dictionary<T, U> data = Api.Content.Load<Dictionary<T, U>>(path);
+            Dictionary<T, U> data = Utilities.Content.Load<Dictionary<T, U>>(path);
 
-            return Api.Content.GetDataEntry<T, U>(data, id);
+            return Utilities.Content.GetDataEntry<T, U>(data, id);
         }
 
         public static Dictionary<T, U> LoadData<T, U>(string path)
         {
-            return Api.Content.Load<Dictionary<T, U>>(path);
+            return Utilities.Content.Load<Dictionary<T, U>>(path);
         }
 
         public static string BuildPath(string[] parts)
@@ -89,7 +104,17 @@ namespace Paritee.StardewValley.Core.Api
 
         public static string[] ParseDataValue(string str)
         {
-            return str.Split(Constants.Content.DataValueDelimiter);
+            return str.Split(Utilities.Content.DataValueDelimiter);
+        }
+
+        public static int GetWidthOfString(string str, int widthContraint = 9999999)
+        {
+            return SpriteText.getWidthOfString(str);
+        }
+
+        public static string FormatMoneyString(int amount)
+        {
+            return "$" + Utilities.Content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", amount);
         }
     }
 }

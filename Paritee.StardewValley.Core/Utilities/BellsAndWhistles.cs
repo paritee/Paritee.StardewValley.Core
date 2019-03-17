@@ -1,15 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using System;
 
-namespace Paritee.StardewValley.Core.Api
+namespace Paritee.StardewValley.Core.Utilities
 {
     public class BellsAndWhistles
     {
-        public static void PlaySound(string cueName)
+        public static void PlaySound(string soundName, int timer = default(int), GameLocation location = null)
         {
-            Game1.playSound(cueName);
+            if (timer == default(int))
+            {
+                Game1.playSound(soundName);
+            }
+            else
+            {
+                DelayedAction.playSoundAfterDelay(soundName, timer, location);
+            }
         }
 
         public static bool HasSoundBank()
@@ -19,7 +28,7 @@ namespace Paritee.StardewValley.Core.Api
 
         public static void CueSound(string sound, string name, float value)
         {
-            if (!Api.BellsAndWhistles.HasSoundBank())
+            if (!Utilities.BellsAndWhistles.HasSoundBank())
             {
                 return;
             }
@@ -74,6 +83,11 @@ namespace Paritee.StardewValley.Core.Api
         public static void AddHudMessage(string type, int number, bool add, Color color, Item messageSubject = null)
         {
             Game1.addHUDMessage(new HUDMessage(type, number, add, color, messageSubject));
+        }
+
+        public static void DrawScroll(SpriteBatch spriteBatch, string str, int x, int y, string placeHolderWidthText = "", float alpha = 1f, int color = -1)
+        {
+            SpriteText.drawStringWithScrollBackground(spriteBatch, str, x, y, placeHolderWidthText, alpha, color);
         }
     }
 }

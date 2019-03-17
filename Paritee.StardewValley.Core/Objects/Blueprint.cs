@@ -1,4 +1,4 @@
-﻿namespace Paritee.StardewValley.Core.Constants
+﻿namespace Paritee.StardewValley.Core.Objects
 {
     public class Blueprint
     {

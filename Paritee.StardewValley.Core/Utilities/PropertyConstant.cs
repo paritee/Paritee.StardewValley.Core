@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Paritee.StardewValley.Core.Models
+namespace Paritee.StardewValley.Core.Utilities
 {
     public class PropertyConstant
     {
-        protected string Name { get; set; }
+        private string Name { get; set; }
 
         protected PropertyConstant(string name)
         {
@@ -27,7 +27,7 @@ namespace Paritee.StardewValley.Core.Models
         {
             return str == null 
                 ? false 
-                : Helpers.Reflection.GetProperty(typeof(T), PropertyConstant.Parse(str), BindingFlags.Static | BindingFlags.Public) != null;
+                : Utilities.Reflection.GetProperty(typeof(T), PropertyConstant.Parse(str), BindingFlags.Static | BindingFlags.Public) != null;
         }
 
         protected static List<T> All<T>()
