@@ -11,17 +11,5 @@ namespace Paritee.StardewValley.Core.Characters
         {
             this.DeluxeProduceLuck = deluxeProduceLuck;
         }
-
-        public static bool Exists(string str)
-        {
-            return Utilities.PropertyConstant.Exists<Livestock>(str);
-        }
-
-        public static List<string> All()
-        {
-            List<Livestock> all = Utilities.PropertyConstant.All<Livestock>();
-
-            return all.Select(o => o.ToString()).ToList();
-        }
     }
 }
