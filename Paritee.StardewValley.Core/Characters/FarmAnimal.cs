@@ -1414,14 +1414,59 @@ namespace Paritee.StardewValley.Core.Characters
          * Vanilla
          ***/
 
-        public static bool IsVanilla(global::StardewValley.FarmAnimal animal)
+        public static List<Characters.LivestockCategory> GetVanillaCategories()
         {
-            return Characters.FarmAnimal.IsVanilla(Characters.FarmAnimal.GetType(animal));
+            return new List<Characters.LivestockCategory>()
+            {
+                Characters.FarmAnimal.ChickenCategory,
+                Characters.FarmAnimal.DairyCowCategory,
+                Characters.FarmAnimal.DinosaurCategory,
+                Characters.FarmAnimal.DuckCategory,
+                Characters.FarmAnimal.GoatCategory,
+                Characters.FarmAnimal.PigCategory,
+                Characters.FarmAnimal.RabbitCategory,
+                Characters.FarmAnimal.SheepCategory,
+            }
+            .OrderBy(o => o.Order)
+            .ToList();
         }
 
-        public static bool IsVanilla(string type)
+        public static List<Characters.Livestock> GetVanillaTypes()
         {
-            return Characters.Livestock.Exists(type);
+            return new List<Characters.Livestock>()
+            {
+                FarmAnimal.WhiteChicken,
+                FarmAnimal.BrownChicken,
+                FarmAnimal.BlueChicken,
+                FarmAnimal.VoidChicken,
+                FarmAnimal.WhiteCow,
+                FarmAnimal.BrownCow,
+                FarmAnimal.Goat,
+                FarmAnimal.Duck,
+                FarmAnimal.Sheep,
+                FarmAnimal.Rabbit,
+                FarmAnimal.Pig,
+                FarmAnimal.Dinosaur,
+            };
+        }
+
+        public static bool IsVanilla(global::StardewValley.FarmAnimal animal)
+        {
+            return Characters.FarmAnimal.IsVanillaType(Characters.FarmAnimal.GetType(animal));
+        }
+
+        public static bool IsVanillaType(string type)
+        {
+            return FarmAnimal.GetVanillaTypes()
+                .Select(o => o.ToString())
+                .Contains(type);
+        }
+
+        public static bool IsVanillaCategory(string category)
+        {
+            return FarmAnimal.GetVanillaCategories()
+                .Select(o => o.ToString())
+                .Contains(category);
         }
     }
 }

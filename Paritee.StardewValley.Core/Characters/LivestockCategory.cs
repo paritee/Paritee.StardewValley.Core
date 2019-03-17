@@ -25,18 +25,6 @@ namespace Paritee.StardewValley.Core.Characters
             return this.AnimalShop != null;
         }
 
-        public static bool Exists(string str)
-        {
-            return Utilities.PropertyConstant.Exists<LivestockCategory>(str);
-        }
-
-        public static List<LivestockCategory> All()
-        {
-            List<LivestockCategory> all = Utilities.PropertyConstant.All<LivestockCategory>();
-
-            return all.OrderBy(o => o.Order).ToList();
-        }
-
         public static string LoadDisplayName(string id)
         {
             return Utilities.Content.LoadString($"Strings\\StringsFromCSFiles:Utility.cs.{id}");
