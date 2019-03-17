@@ -48,44 +48,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\AnimalHouse.cs" />
-    <Compile Include="Api\AnimalShop.cs" />
-    <Compile Include="Api\BellsAndWhistles.cs" />
-    <Compile Include="Api\Content.cs" />
-    <Compile Include="Api\Dialogue.cs" />
-    <Compile Include="Api\Event.cs" />
-    <Compile Include="Api\FarmAnimal.cs" />
-    <Compile Include="Api\Farmer.cs" />
-    <Compile Include="Api\Game.cs" />
-    <Compile Include="Api\Location.cs" />
-    <Compile Include="Api\Menu.cs" />
-    <Compile Include="Api\Mod.cs" />
-    <Compile Include="Api\Object.cs" />
-    <Compile Include="Api\PurchaseAnimalsMenu.cs" />
-    <Compile Include="Api\Season.cs" />
-    <Compile Include="Api\Weather.cs" />
-    <Compile Include="Constants\AnimalHouse.cs" />
-    <Compile Include="Constants\AnimalShop.cs" />
-    <Compile Include="Constants\Animals\Mount.cs" />
-    <Compile Include="Constants\Blueprint.cs" />
-    <Compile Include="Constants\Content.cs" />
-    <Compile Include="Constants\Currency.cs" />
-    <Compile Include="Constants\Event.cs" />
-    <Compile Include="Constants\FarmAnimal.cs" />
-    <Compile Include="Constants\Farmer.cs" />
-    <Compile Include="Constants\Mod.cs" />
-    <Compile Include="Constants\Environment.cs" />
-    <Compile Include="Constants\Object.cs" />
-    <Compile Include="Constants\Animals\LivestockCategory.cs" />
-    <Compile Include="Constants\Animals\Livestock.cs" />
-    <Compile Include="Constants\Animals\Pet.cs" />
-    <Compile Include="Helpers\Random.cs" />
-    <Compile Include="Helpers\Reflection.cs" />
-    <Compile Include="Models\Animal.cs" />
-    <Compile Include="Models\LivestockAnimalShop.cs" />
-    <Compile Include="Models\LivestockCategory.cs" />
-    <Compile Include="Models\Livestock.cs" />
-    <Compile Include="Models\PropertyConstant.cs" />
+    <Compile Include="Characters\Animal.cs" />
+    <Compile Include="Locations\AnimalHouse.cs" />
+    <Compile Include="Locations\AnimalShop.cs" />
+    <Compile Include="Utilities\BellsAndWhistles.cs" />
+    <Compile Include="Utilities\Content.cs" />
+    <Compile Include="Utilities\Dialogue.cs" />
+    <Compile Include="Locations\Event.cs" />
+    <Compile Include="Characters\FarmAnimal.cs" />
+    <Compile Include="Characters\Farmer.cs" />
+    <Compile Include="Utilities\Game.cs" />
+    <Compile Include="Locations\Location.cs" />
+    <Compile Include="Menus\Menu.cs" />
+    <Compile Include="Utilities\Mod.cs" />
+    <Compile Include="Objects\Object.cs" />
+    <Compile Include="Menus\PurchaseAnimals.cs" />
+    <Compile Include="Locations\Season.cs" />
+    <Compile Include="Locations\Weather.cs" />
+    <Compile Include="Characters\Mount.cs" />
+    <Compile Include="Objects\Blueprint.cs" />
+    <Compile Include="Utilities\Currency.cs" />
+    <Compile Include="Characters\LivestockCategory.cs" />
+    <Compile Include="Characters\Livestock.cs" />
+    <Compile Include="Characters\Pet.cs" />
+    <Compile Include="Utilities\Random.cs" />
+    <Compile Include="Utilities\Reflection.cs" />
+    <Compile Include="Characters\LivestockAnimalShop.cs" />
+    <Compile Include="Utilities\PropertyConstant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +83,7 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.2.0\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
